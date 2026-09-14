@@ -3238,7 +3238,7 @@ function openEcartGoulots(deptNom, it, defav) {
     const b = document.createElement("button");
     b.className = "tag" + (f.d.nom !== deptNom ? " autre" : "");
     b.innerHTML = `<span class="id">${f.g.id}</span>${f.g.titre}` + (f.d.nom !== deptNom ? `<span class="pd">${f.d.titre || f.d.nom}</span>` : "");
-    b.addEventListener("click", () => openGoulot(f));
+    b.addEventListener("click", () => allerAuGoulot(f.g.id));
     host.appendChild(b);
   });
   if (!(it.goulots || []).length) host.innerHTML = `<span class="rap-none">Aucun goulot rattaché</span>`;
@@ -4779,6 +4779,22 @@ function amRafraichirCartes() {
   renderAmelio();
   amSel = keep;
   det.scrollTop = scroll;
+}
+
+/* Ouvre la fiche d'un goulot dans le Kanban : processus EPC à gauche, détail à droite */
+function allerAuGoulot(id) {
+  closeOverlays();
+  closePopup();
+  const sd = document.getElementById("am-dept"), ss = document.getElementById("am-statut");
+  if (sd.options.length) sd.value = "";
+  ss.value = "";
+  globauxEl.classList.remove("open");
+  document.getElementById("menu-rapport").classList.remove("active");
+  amSel = id;
+  amProcSel = null;
+  openAmelio();
+  const det = document.getElementById("am-detail");
+  if (det) det.scrollTop = 0;
 }
 
 function openAmelio() {
