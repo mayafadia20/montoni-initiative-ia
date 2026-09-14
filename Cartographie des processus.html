@@ -808,6 +808,15 @@
   .epc-func.goulot{background:#c0392b;box-shadow:0 0 0 4px rgba(192,57,43,.22);}
   .epc-func.goulot .num{opacity:.85;}
   .am-epc-empty{padding:40px 24px;font-size:13px;color:rgba(13,13,13,.55);line-height:1.5;}
+  .am-cause{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;}
+  .am-cause p{flex:1;margin:0;}
+  .am-cause .rap-src{flex:0 0 28px;width:28px;height:28px;margin:0;border:1px solid rgba(13,13,13,.25);}
+  .am-cause .rap-src:hover{background:#81907a;color:#fff;border-color:#81907a;}
+  .am-racine{background:#f6f7f4;border-left:3px solid #81907a;border-radius:0 6px 6px 0;padding:10px 12px;font-size:13px;line-height:1.5;margin-bottom:16px;}
+  .am-racine .n{display:block;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#566a4d;margin-bottom:3px;font-weight:600;}
+  .am-btns{margin-bottom:4px;}
+  .am-btns .am-ishi{background:#0d0d0d;}
+  .am-btns .am-ishi:hover{background:#333;}
   #rapport{
     position:fixed;top:0;left:400px;right:0;bottom:0;display:none;flex-direction:column;
     background:#fff;color:#0d0d0d;z-index:4;
@@ -4576,6 +4585,21 @@ function amEPC(it) {
   if (first) requestAnimationFrame(() => first.scrollIntoView({ block: "center" }));
 }
 
+/* Fenêtre Source : la citation de l'entrevue d'où vient le goulot */
+function amSource(it) {
+  const { d, dg, g } = it;
+  setPopupDept(d.nom);
+  document.getElementById("p-titre").textContent = "Goulot " + g.id + " — " + g.titre;
+  document.getElementById("p-quand").textContent = diagLabel(dg) + (dg.date ? " · " + dg.date : "") + (dg.duree ? " · " + dg.duree : "");
+  const pp = parseParticipants(dg.participants || "");
+  document.getElementById("p-qui").textContent = pp.noms.length ? pp.noms.join(", ") : (dg.participants || "Non documenté");
+  document.getElementById("p-contexte").textContent = g.detail || dg.contexte || "Non documenté";
+  const q = document.getElementById("p-citation");
+  if (g.citation) { q.textContent = "« " + g.citation + " »"; q.classList.remove("none"); }
+  else { q.textContent = "Aucune citation relevée pour ce goulot."; q.classList.add("none"); }
+  popup.classList.add("open");
+}
+
 function amDetail() {
   const det = document.getElementById("am-detail");
   const it = amSel && amIndex.find(x => x.g.id === amSel);
@@ -4590,12 +4614,16 @@ function amDetail() {
   det.appendChild(close);
 
   const head = document.createElement("div");
+  const pq = g.pourquoi || [];
   head.innerHTML =
     `<div class="kicker">Goulot ${g.id}</div><h3>${g.titre}</h3><div class="dept">${d.nom} · ${diagLabel(dg)}</div>` +
-    `<p>${g.detail || ""}</p>` + (g.citation ? `<blockquote>« ${g.citation} »</blockquote>` : "") +
-    (g.cause ? `<div class="kicker">Cause</div><p>${g.cause}</p>` : "") +
-    ((g.pourquoi || []).length ? `<div class="kicker">Cinq pourquoi</div><ul class="pourquoi">${g.pourquoi.map(x => `<li>${x}</li>`).join("")}</ul>` : "");
+    `<div class="kicker">Cause</div><div class="am-cause"><p>${g.cause || g.detail || ""}</p><button class="rap-src am-src" title="Citation de l'entrevue">→</button></div>` +
+    (pq.length ? `<div class="kicker">Cause racine</div><div class="am-racine"><span class="n">Pourquoi ${pq.length}</span>${pq[pq.length - 1]}</div>` : "") +
+    `<div class="g-btns am-btns"><button class="am-whys">Analyse des Pourquoi</button><button class="am-ishi">Diagramme d'Ishikawa</button></div>`;
   det.appendChild(head);
+  head.querySelector(".am-src").addEventListener("click", () => amSource(it));
+  head.querySelector(".am-whys").addEventListener("click", () => { currentGoulot = { d, dg, g }; openWhys(); });
+  head.querySelector(".am-ishi").addEventListener("click", () => { currentGoulot = { d, dg, g }; openIshikawa(); });
 
   /* Catégories de piste : une ou deux, modifiables */
   const sep0 = document.createElement("div"); sep0.className = "sep2"; det.appendChild(sep0);
