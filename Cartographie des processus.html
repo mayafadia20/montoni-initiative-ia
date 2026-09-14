@@ -835,6 +835,7 @@
   .sys-lien:hover line:not(.hit){stroke:#0d0d0d;stroke-opacity:.9;}
   .sys-lien.dim{opacity:.08;}
   .sys-bulle circle{stroke:#fff;stroke-width:1.5;}
+  .sys-lbl-ext{paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round;font-weight:600;}
   .sys-lg{display:flex;align-items:center;gap:10px;font-size:11.5px;color:rgba(13,13,13,.65);margin-bottom:6px;}
   .sys-lg line{stroke:#566a4d;stroke-width:1.1;}
   .sys-ech div{display:grid;grid-template-columns:1fr 90px 26px;align-items:center;gap:8px;font-size:12px;padding:4px 0;}
@@ -4889,7 +4890,7 @@ function sysLayout(liste, liens, rMax) {
     });
     cercles.forEach(c => { c.x *= 1 - 0.004 * t; c.y *= 1 - 0.004 * t; });
     for (let k = 0; k < 3; k++) for (let i = 0; i < cercles.length; i++) for (let j = i + 1; j < cercles.length; j++) {
-      const A = cercles[i], B = cercles[j], dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || 0.01, min = A.r + B.r + 8;
+      const A = cercles[i], B = cercles[j], dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || 0.01, min = A.r + B.r + 8 + (A.r < 22 ? 9 : 0) + (B.r < 22 ? 9 : 0);
       if (d < min) { const push = (min - d) / d / 2; A.x -= dx * push; A.y -= dy * push; B.x += dx * push; B.y += dy * push; }
     }
   }
@@ -4912,10 +4913,43 @@ function renderSystemes() {
 
   const R_MAX = 70, maxN = liste[0].n;
   const cercles = sysLayout(liste, liens, R_MAX);
+
+  /* Étiquettes : dans la bulle si le nom y tient, sinon à côté, à la place qui ne recouvre rien */
+  const tientDedans = c => c.r >= 22 || c.r * 1.8 >= c.p.nom.length * 0.58 * 8.5;
+  const estW = nom => nom.length * 0.68 * 10 + 8, LH = 13;
+  const rects = [], ext = new Map();
+  const heurteBulle = (rx, ry, w, h, nom) => cercles.some(o => {
+    if (o.p.nom === nom) return false;
+    const cx = Math.max(rx, Math.min(o.x, rx + w)), cy = Math.max(ry, Math.min(o.y, ry + h));
+    return (cx - o.x) ** 2 + (cy - o.y) ** 2 < o.r * o.r;
+  });
+  const heurteEtiq = (rx, ry, w, h) => rects.some(r => rx < r.x + r.w && rx + w > r.x && ry < r.y + r.h && ry + h > r.y);
+  cercles.filter(c => !tientDedans(c)).forEach(c => {
+    const w = estW(c.p.nom), h = LH, P = c;
+    const cands = [
+      { x: P.x - w / 2, y: P.y + P.r + 3, anchor: "middle", tx: P.x, ty: P.y + P.r + 13 },
+      { x: P.x + P.r + 4, y: P.y - h / 2, anchor: "start", tx: P.x + P.r + 5, ty: P.y + 3.5 },
+      { x: P.x - P.r - 4 - w, y: P.y - h / 2, anchor: "end", tx: P.x - P.r - 5, ty: P.y + 3.5 },
+      { x: P.x - w / 2, y: P.y - P.r - 3 - h, anchor: "middle", tx: P.x, ty: P.y - P.r - 6 },
+      { x: P.x + P.r * 0.72 + 3, y: P.y + P.r * 0.72, anchor: "start", tx: P.x + P.r * 0.72 + 4, ty: P.y + P.r * 0.72 + 9 },
+      { x: P.x - P.r * 0.72 - 3 - w, y: P.y + P.r * 0.72, anchor: "end", tx: P.x - P.r * 0.72 - 4, ty: P.y + P.r * 0.72 + 9 },
+      { x: P.x + P.r * 0.72 + 3, y: P.y - P.r * 0.72 - h, anchor: "start", tx: P.x + P.r * 0.72 + 4, ty: P.y - P.r * 0.72 - 3 },
+      { x: P.x - P.r * 0.72 - 3 - w, y: P.y - P.r * 0.72 - h, anchor: "end", tx: P.x - P.r * 0.72 - 4, ty: P.y - P.r * 0.72 - 3 },
+    ];
+    let best = null, bestScore = Infinity;
+    cands.forEach((k, i) => {
+      const score = (heurteBulle(k.x, k.y, w, h, c.p.nom) ? 10 : 0) + (heurteEtiq(k.x, k.y, w, h) ? 5 : 0) + i * 0.1;
+      if (score < bestScore) { bestScore = score; best = k; }
+    });
+    rects.push({ x: best.x, y: best.y, w, h }); ext.set(c.p.nom, best);
+  });
+
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   cercles.forEach(c => { minX = Math.min(minX, c.x - c.r); minY = Math.min(minY, c.y - c.r); maxX = Math.max(maxX, c.x + c.r); maxY = Math.max(maxY, c.y + c.r); });
-  const pad = 24, W = maxX - minX + pad * 2, H = maxY - minY + pad * 2;
+  rects.forEach(r => { minX = Math.min(minX, r.x); minY = Math.min(minY, r.y); maxX = Math.max(maxX, r.x + r.w); maxY = Math.max(maxY, r.y + r.h); });
+  const pad = 20, W = maxX - minX + pad * 2, H = maxY - minY + pad * 2;
   const pos = new Map(cercles.map(c => [c.p.nom, { x: c.x - minX + pad, y: c.y - minY + pad, r: c.r }]));
+  ext.forEach(k => { k.tx += pad - minX; k.ty += pad - minY; });
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(NS, "svg");
   svg.setAttribute("viewBox", `0 0 ${W.toFixed(0)} ${H.toFixed(0)}`);
@@ -4962,10 +4996,14 @@ function renderSystemes() {
       t.setAttribute("y", P.y - 1); t.setAttribute("font-size", Math.min(13, Math.max(8.5, P.r / 3)));
       const l1 = document.createElementNS(NS, "tspan"); l1.setAttribute("x", P.x); l1.textContent = p.nom; t.appendChild(l1);
       const l2 = document.createElementNS(NS, "tspan"); l2.setAttribute("x", P.x); l2.setAttribute("dy", "1.25em"); l2.setAttribute("font-weight", "400"); l2.setAttribute("font-size", Math.min(11, P.r / 4)); l2.textContent = p.n + " étape" + (p.n > 1 ? "s" : ""); t.appendChild(l2);
-    } else if (P.r >= 14 && p.nom.length <= 8) {
-      t.setAttribute("y", P.y + 3); t.setAttribute("font-size", Math.min(10, Math.max(7.5, P.r * 2.4 / p.nom.length))); t.textContent = p.nom;
+    } else if (!ext.has(p.nom)) {
+      /* Le nom tient dans la bulle en petit */
+      t.setAttribute("y", P.y + 3); t.setAttribute("font-size", Math.min(10.5, Math.max(8.5, P.r * 1.8 / (p.nom.length * 0.58)))); t.textContent = p.nom;
     } else {
-      t.setAttribute("y", P.y + 3); t.setAttribute("font-size", Math.max(7.5, P.r / 2.4)); t.textContent = capInitiales(p.nom);
+      /* Nom complet à côté de la bulle, avec un liseré blanc pour rester lisible sur les lignes */
+      const L = ext.get(p.nom);
+      t.setAttribute("class", "sys-lbl-ext"); t.setAttribute("x", L.tx); t.setAttribute("y", L.ty); t.setAttribute("text-anchor", L.anchor);
+      t.setAttribute("font-size", 10); t.setAttribute("fill", "#0d0d0d"); t.textContent = p.nom;
     }
     g.appendChild(t);
     g.addEventListener("mousemove", e => {
