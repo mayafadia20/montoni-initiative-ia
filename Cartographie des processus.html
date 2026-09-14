@@ -699,6 +699,94 @@
   .cap-proc li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:50%;background:#81907a;}
   .cap-empty{font-size:12px;color:rgba(13,13,13,.55);line-height:1.5;}
   .cap-note{font-size:11px;color:rgba(13,13,13,.5);line-height:1.5;margin-top:14px;}
+  /* ---------- Projets d'amélioration continue : Kanban des pistes ---------- */
+  #amelio{
+    position:fixed;top:0;left:400px;right:0;bottom:0;display:none;flex-direction:column;
+    background:#fff;color:#0d0d0d;z-index:4;
+  }
+  #amelio.open{display:flex;}
+  #am-close{
+    width:36px;height:36px;border-radius:50%;border:1px solid rgba(13,13,13,.25);background:#fff;color:#0d0d0d;
+    font-size:18px;line-height:1;cursor:pointer;
+  }
+  #am-close:hover{background:#81907a;color:#fff;border-color:#81907a;}
+  .am-bar{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 40px;border-bottom:1px solid rgba(13,13,13,.1);
+    background:#f6f7f4;
+  }
+  .am-bar label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(13,13,13,.55);display:flex;align-items:center;gap:8px;}
+  .am-bar select{
+    font:inherit;font-size:13px;padding:7px 10px;border:1px solid rgba(13,13,13,.25);border-radius:6px;background:#fff;color:#0d0d0d;
+    text-transform:none;letter-spacing:0;
+  }
+  .am-bar select:focus{outline:none;border-color:#81907a;}
+  .am-bar .am-count{margin-left:auto;font-size:12px;color:rgba(13,13,13,.6);}
+  .am-bar .am-count b{color:#0d0d0d;}
+  .am-body{flex:1;display:flex;min-height:0;}
+  .am-board{flex:1;min-width:0;overflow:auto;padding:22px 40px 40px;display:flex;gap:14px;align-items:flex-start;}
+  .am-col{
+    flex:0 0 250px;width:250px;background:#f6f7f4;border:1px solid rgba(13,13,13,.1);border-radius:10px;
+    display:flex;flex-direction:column;max-height:100%;
+  }
+  .am-col.over{border-color:#81907a;background:rgba(129,144,122,.14);}
+  .am-col h3{
+    font-size:12px;letter-spacing:.06em;text-transform:uppercase;line-height:1.3;padding:12px 14px 10px;
+    border-bottom:2px solid #81907a;display:flex;justify-content:space-between;gap:8px;align-items:flex-start;
+  }
+  .am-col h3 .n{
+    flex:0 0 auto;font-size:11px;background:#0d0d0d;color:#fff;border-radius:10px;padding:2px 8px;letter-spacing:0;
+  }
+  .am-cards{padding:10px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:60px;}
+  .am-card{
+    background:#fff;border:1px solid rgba(13,13,13,.12);border-left:4px solid #81907a;border-radius:6px;padding:9px 10px 8px;
+    cursor:grab;transition:box-shadow .15s,transform .15s;
+  }
+  .am-card:hover{box-shadow:0 3px 12px rgba(0,0,0,.12);transform:translateY(-1px);}
+  .am-card.sel{border-color:#0d0d0d;box-shadow:0 0 0 2px rgba(13,13,13,.9);}
+  .am-card.drag{opacity:.4;}
+  .am-card .dept{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(13,13,13,.5);margin-bottom:4px;}
+  .am-card .t{font-size:12.5px;font-weight:600;line-height:1.3;}
+  .am-card .t .id{font-weight:400;color:rgba(13,13,13,.45);margin-right:5px;font-size:11px;}
+  .am-card .meta{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;}
+  .am-chip{font-size:10px;line-height:1.2;padding:3px 7px;border-radius:10px;background:rgba(129,144,122,.16);color:#3f4f38;}
+  .am-chip.st{background:#0d0d0d;color:#fff;}
+  .am-chip.st.encours{background:#81907a;}
+  .am-chip.st.termine{background:#566a4d;}
+  .am-chip.st.attente{background:#b3675c;}
+  .am-chip.pistes{background:#fff;border:1px solid rgba(13,13,13,.2);color:#0d0d0d;}
+  .am-empty{font-size:11.5px;color:rgba(13,13,13,.45);font-style:italic;padding:8px 4px;}
+  .am-detail{
+    width:380px;flex:0 0 380px;border-left:1px solid rgba(13,13,13,.1);padding:22px 24px 40px;overflow-y:auto;display:none;background:#fff;
+  }
+  .am-detail.open{display:block;}
+  .am-detail .kicker{color:#81907a;}
+  .am-detail h3{font-size:19px;font-weight:700;line-height:1.25;margin:4px 0 6px;}
+  .am-detail .dept{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(13,13,13,.5);margin-bottom:12px;}
+  .am-detail p{font-size:12.5px;line-height:1.5;color:rgba(13,13,13,.8);margin-bottom:10px;}
+  .am-detail blockquote{
+    font-size:12px;font-style:italic;color:rgba(13,13,13,.6);border-left:3px solid #81907a;padding:4px 10px;margin:0 0 12px;line-height:1.45;
+  }
+  .am-detail .sep2{height:1px;background:rgba(13,13,13,.1);margin:16px 0 14px;}
+  .am-detail .pourquoi{list-style:none;padding:0;margin:0 0 6px;}
+  .am-detail .pourquoi li{font-size:12px;line-height:1.45;padding:3px 0 3px 18px;position:relative;color:rgba(13,13,13,.8);}
+  .am-detail .pourquoi li::before{content:counter(pq);counter-increment:pq;position:absolute;left:0;top:3px;font-size:10px;font-weight:700;color:#81907a;}
+  .am-detail .pourquoi{counter-reset:pq;}
+  .am-cats{display:flex;flex-direction:column;gap:4px;margin-bottom:6px;}
+  .am-cats label{
+    display:flex;align-items:center;gap:8px;font-size:12px;padding:5px 8px;border-radius:5px;cursor:pointer;
+    text-transform:none;letter-spacing:0;color:#0d0d0d;
+  }
+  .am-cats label:hover{background:rgba(129,144,122,.12);}
+  .am-cats label.on{background:rgba(129,144,122,.22);font-weight:600;}
+  .am-cats input{accent-color:#81907a;}
+  .am-hint{font-size:10.5px;color:rgba(13,13,13,.5);line-height:1.4;margin-bottom:8px;}
+  .am-detail .pistes li{font-size:12px;}
+  .am-detail .projet{margin-top:8px;}
+  .am-close-detail{
+    float:right;width:28px;height:28px;border-radius:50%;border:1px solid rgba(13,13,13,.2);background:#fff;color:#0d0d0d;
+    font-size:14px;line-height:1;cursor:pointer;
+  }
+  .am-close-detail:hover{background:#81907a;color:#fff;border-color:#81907a;}
   #rapport{
     position:fixed;top:0;left:400px;right:0;bottom:0;display:none;flex-direction:column;
     background:#fff;color:#0d0d0d;z-index:4;
@@ -864,6 +952,7 @@
   <button class="menu-item" id="menu-rapport">Rapport des objectifs</button>
   <div id="globaux"></div>
   <button class="menu-item" id="menu-capacite">Capacité des ressources</button>
+  <button class="menu-item" id="menu-amelio">Projets d'amélioration continue</button>
 </aside>
 
 <section id="rapport">
@@ -894,6 +983,33 @@
   </div>
 </section>
 <div class="cap-tip" id="cap-tip"></div>
+
+<section id="amelio">
+  <div class="epc-head">
+    <div>
+      <div class="kicker">Projets d'amélioration continue</div>
+      <h2>Kanban des pistes</h2>
+      <div class="epc-dept">Chaque goulot d'étranglement est classé dans une ou deux catégories de piste. Glisser une carte pour la reclasser, cliquer pour gérer le projet.</div>
+    </div>
+    <button id="am-close" title="Revenir à la scène">✕</button>
+  </div>
+  <div class="am-bar">
+    <label>Département <select id="am-dept"></select></label>
+    <label>Projet <select id="am-statut">
+      <option value="">Tous</option>
+      <option value="sans">Sans projet</option>
+      <option value="À planifier">À planifier</option>
+      <option value="En cours">En cours</option>
+      <option value="En attente">En attente</option>
+      <option value="Terminé">Terminé</option>
+    </select></label>
+    <span class="am-count" id="am-count"></span>
+  </div>
+  <div class="am-body">
+    <div class="am-board" id="am-board"></div>
+    <div class="am-detail" id="am-detail"></div>
+  </div>
+</section>
 
 <div id="scene"></div>
 <div id="labels"></div>
@@ -3642,6 +3758,7 @@ function closeDash() {
   dashEl.classList.remove("open");
   closeRapport();
   closeCapacite();
+  closeAmelio();
   globauxEl.classList.remove("open");
   document.getElementById("menu-rapport").classList.remove("active");
 }
@@ -3673,6 +3790,7 @@ function renderGlobaux() {
 
 function openRapport(g) {
   closeCapacite();
+  closeAmelio();
   document.getElementById("rap-titre").textContent = g.chiffre + " " + g.titre;
   document.getElementById("rap-source").textContent = g.source;
   const map = document.getElementById("rap-map");
@@ -3986,6 +4104,7 @@ function capDetail() {
 
 function openCapacite() {
   closeRapport();
+  closeAmelio();
   globauxEl.querySelectorAll(".glob").forEach(x => x.classList.remove("active"));
   sceneEl.style.display = "none";
   labelsEl.style.display = "none";
@@ -4008,6 +4127,331 @@ function closeCapacite() {
 capBtn.addEventListener("click", () => { if (capEl.classList.contains("open")) closeCapacite(); else openCapacite(); });
 document.getElementById("cap-close").addEventListener("click", closeCapacite);
 
+/* ---------------------------------------------------------------------
+   Projets d'amélioration continue : Kanban des goulots par catégorie de
+   piste. Chaque goulot est classé dans une ou deux catégories ; la
+   classification peut être ajustée par glisser-déposer ou dans le détail,
+   et l'ajustement est conservé localement. Les projets sont les mêmes que
+   ceux créés depuis les diagnostics (même stockage).
+   --------------------------------------------------------------------- */
+const AM_CATS = [
+  { id: "ENAV",  nom: "Élimination des activités à valeur non ajoutée" },
+  { id: "SIMP",  nom: "Simplification de processus" },
+  { id: "STD",   nom: "Standardisation des nomenclatures et gabarits" },
+  { id: "RESP",  nom: "Clarification des responsabilités" },
+  { id: "CAP",   nom: "Gestion de la capacité" },
+  { id: "DATA",  nom: "Amélioration de la disponibilité des données" },
+  { id: "INTEG", nom: "Intégration de systèmes" },
+  { id: "AUTO",  nom: "Automatisation" },
+  { id: "IA",    nom: "Intégration d'intelligence artificielle" },
+];
+
+/* Classification initiale des goulots (une ou deux catégories par goulot) */
+const AM_CLASSIF = {
+  /* PSDT */
+  "6.1": ["IA", "AUTO"], "6.5": ["AUTO", "IA"], "6.6": ["DATA", "STD"], "6.7": ["DATA", "ENAV"], "6.8": ["DATA", "INTEG"],
+  "6.9": ["SIMP", "CAP"], "6.2": ["INTEG", "AUTO"], "6.3": ["SIMP", "STD"], "6.4": ["AUTO", "STD"], "6.10": ["CAP", "RESP"],
+  "6.11": ["CAP", "DATA"], "6.12": ["STD", "RESP"], "6.13": ["SIMP", "RESP"],
+  /* Urbanisme */
+  "5.1": ["IA", "AUTO"], "5.4": ["AUTO", "IA"], "5.6": ["IA"], "5.7": ["DATA", "IA"], "5.9": ["DATA", "INTEG"],
+  "5.2": ["AUTO", "STD"], "5.3": ["CAP"], "5.5": ["STD", "ENAV"], "5.8": ["SIMP", "RESP"],
+  /* Location */
+  "9.1": ["AUTO", "IA"], "9.2": ["AUTO"], "9.3": ["IA", "AUTO"], "9.4": ["INTEG", "AUTO"], "9.5": ["DATA", "AUTO"],
+  "9.8": ["DATA", "INTEG"], "9.9": ["SIMP"], "9.10": ["DATA", "STD"], "9.6": ["AUTO", "ENAV"], "9.7": ["RESP", "CAP"], "9.11": ["DATA"],
+  /* Développement de projets */
+  "1.1": ["DATA", "STD"], "1.5": ["ENAV", "INTEG"], "1.8": ["IA", "DATA"], "1.15": ["INTEG"], "1.4": ["INTEG", "AUTO"],
+  "1.11": ["CAP", "RESP"], "1.2": ["AUTO", "STD"], "1.3": ["STD", "INTEG"], "1.9": ["CAP", "STD"], "1.14": ["STD", "RESP"],
+  "1.6": ["STD", "AUTO"], "1.12": ["CAP", "DATA"], "1.10": ["INTEG"], "1.7": ["IA"], "1.13": ["AUTO", "SIMP"],
+  /* Design et Architecture */
+  "7.2": ["IA"], "7.4": ["DATA", "STD"], "7.5": ["DATA", "IA"], "7.6": ["AUTO", "RESP"], "7.10": ["CAP"],
+  "7.1": ["IA", "DATA"], "7.3": ["IA", "STD"], "7.7": ["ENAV", "RESP"], "7.8": ["SIMP", "INTEG"], "7.9": ["DATA", "IA"],
+  /* Estimation */
+  "3.1": ["INTEG", "AUTO"], "3.5": ["STD", "DATA"], "3.7": ["DATA", "INTEG"], "3.8": ["AUTO", "STD"], "3.11": ["DATA", "STD"],
+  "3.3": ["AUTO", "ENAV"], "3.6": ["DATA", "AUTO"], "3.12": ["AUTO", "SIMP"], "3.2": ["ENAV", "INTEG"], "3.4": ["IA", "STD"],
+  "3.9": ["STD", "RESP"], "3.10": ["SIMP", "RESP"],
+  /* Génie conseil et CQ */
+  "8.1": ["INTEG", "AUTO"], "8.2": ["AUTO", "INTEG"], "8.3": ["IA", "STD"], "8.6": ["DATA", "CAP"], "8.7": ["DATA", "STD"],
+  "8.8": ["DATA", "RESP"], "8.9": ["RESP", "SIMP"], "8.10": ["SIMP", "AUTO"], "8.11": ["AUTO", "IA"], "8.4": ["STD", "INTEG"], "8.5": ["ENAV", "IA"],
+  /* Construction */
+  "4.1": ["SIMP", "RESP"], "4.2": ["DATA", "STD"], "4.3": ["CAP"], "4.4": ["CAP", "DATA"], "4.5": ["INTEG", "AUTO"],
+  "4.6": ["AUTO", "ENAV"], "4.7": ["SIMP", "STD"], "4.8": ["SIMP", "RESP"],
+  /* Approvisionnement */
+  "10.1": ["AUTO", "INTEG"], "10.2": ["AUTO", "ENAV"], "10.3": ["ENAV", "AUTO"], "10.4": ["STD", "DATA"], "10.5": ["DATA", "AUTO"],
+  "10.6": ["INTEG", "DATA"], "10.7": ["DATA", "INTEG"], "10.8": ["STD"],
+  /* Investissement */
+  "2.1": ["AUTO", "STD"], "2.5": ["DATA", "STD"], "2.8": ["CAP", "IA"], "2.13": ["IA", "RESP"], "2.2": ["INTEG", "AUTO"],
+  "2.4": ["DATA", "INTEG"], "2.11": ["STD", "DATA"], "2.9": ["INTEG", "STD"], "2.10": ["SIMP", "RESP"], "2.12": ["SIMP", "RESP"],
+  "2.6": ["IA"], "2.7": ["STD", "IA"], "2.14": ["INTEG", "RESP"], "2.3": ["AUTO", "DATA"],
+  /* Finance Construction */
+  "13.1": ["DATA", "INTEG"], "13.2": ["INTEG", "AUTO"], "13.3": ["INTEG", "AUTO"], "13.4": ["AUTO", "SIMP"], "13.5": ["AUTO"],
+  "13.6": ["SIMP", "AUTO"], "13.7": ["RESP", "CAP"], "13.8": ["DATA", "INTEG"],
+  /* Finance Paie */
+  "14.1": ["INTEG"], "14.2": ["SIMP", "AUTO"], "14.3": ["INTEG", "DATA"], "14.4": ["AUTO", "STD"], "14.5": ["STD"],
+  "14.6": ["RESP", "CAP"], "14.7": ["RESP", "AUTO"], "14.8": ["INTEG", "RESP"], "14.9": ["STD"], "14.10": ["CAP", "INTEG"],
+  /* Administration */
+  "11.1": ["INTEG"], "11.2": ["SIMP", "ENAV"], "11.3": ["STD", "DATA"], "11.4": ["AUTO", "STD"], "11.5": ["DATA"],
+  "11.6": ["CAP", "STD"], "11.7": ["RESP", "DATA"], "11.8": ["SIMP"], "11.9": ["INTEG", "DATA"],
+  /* Affaires publiques */
+  "12.1": ["DATA", "RESP"], "12.2": ["SIMP", "RESP"], "12.3": ["RESP", "DATA"], "12.4": ["STD", "AUTO"], "12.5": ["ENAV", "RESP"],
+  "12.6": ["AUTO", "IA"], "12.7": ["IA"], "12.8": ["IA", "AUTO"],
+};
+
+const AM_CAT_KEY = "montoni.categories";
+function amCatStore() { try { return JSON.parse(localStorage.getItem(AM_CAT_KEY) || "{}"); } catch (e) { return {}; } }
+function amCatSave(o) { try { localStorage.setItem(AM_CAT_KEY, JSON.stringify(o)); } catch (e) {} }
+function amCatsDe(id) { const o = amCatStore(); return (o[id] || AM_CLASSIF[id] || []).slice(0, 2); }
+function amSetCats(id, cats) { const o = amCatStore(); o[id] = cats.slice(0, 2); amCatSave(o); }
+
+const amEl = document.getElementById("amelio");
+const amBtn = document.getElementById("menu-amelio");
+let amSel = null, amIndex = null;
+
+/* Index plat de tous les goulots avec leur département et leur diagnostic */
+function amIndexer() {
+  const out = [];
+  DEPARTEMENTS.forEach((d, di) => {
+    (d.diagnostics || []).forEach(dg => {
+      (dg.goulots || []).forEach(g => out.push({ d, di, dg, g }));
+    });
+  });
+  return out;
+}
+
+function amStatutClass(st) {
+  return { "En cours": "encours", "Terminé": "termine", "En attente": "attente" }[st] || "";
+}
+
+function renderAmelio() {
+  if (!amIndex) amIndex = amIndexer();
+  const board = document.getElementById("am-board");
+  const selDept = document.getElementById("am-dept");
+  const selSt = document.getElementById("am-statut");
+
+  if (!selDept.options.length) {
+    selDept.innerHTML = '<option value="">Tous les départements</option>' +
+      DEPARTEMENTS.filter(d => (d.diagnostics || []).some(dg => (dg.goulots || []).length))
+        .map(d => `<option value="${d.nom}">${d.nom}</option>`).join("");
+    selDept.addEventListener("change", renderAmelio);
+    selSt.addEventListener("change", renderAmelio);
+  }
+  const fDept = selDept.value, fSt = selSt.value;
+
+  const visibles = amIndex.filter(it => {
+    if (fDept && it.d.nom !== fDept) return false;
+    if (fSt) {
+      const e = entryFor(it.d, it.g);
+      if (fSt === "sans") { if (e.projet) return false; }
+      else if (!e.projet || e.projet.statut !== fSt) return false;
+    }
+    return true;
+  });
+  const nbProjets = visibles.filter(it => entryFor(it.d, it.g).projet).length;
+  document.getElementById("am-count").innerHTML =
+    `<b>${visibles.length}</b> goulot${visibles.length > 1 ? "s" : ""} · <b>${nbProjets}</b> projet${nbProjets > 1 ? "s" : ""} d'amélioration`;
+
+  board.innerHTML = "";
+  AM_CATS.forEach(cat => {
+    const col = document.createElement("div");
+    col.className = "am-col"; col.dataset.cat = cat.id;
+    const items = visibles.filter(it => amCatsDe(it.g.id).includes(cat.id));
+    col.innerHTML = `<h3><span>${cat.nom}</span><span class="n">${items.length}</span></h3>`;
+    const cards = document.createElement("div"); cards.className = "am-cards";
+    if (!items.length) cards.innerHTML = '<div class="am-empty">Aucun goulot dans cette catégorie.</div>';
+    items.forEach(it => cards.appendChild(amCarte(it, cat.id)));
+    col.appendChild(cards);
+
+    col.addEventListener("dragover", e => { e.preventDefault(); col.classList.add("over"); });
+    col.addEventListener("dragleave", () => col.classList.remove("over"));
+    col.addEventListener("drop", e => {
+      e.preventDefault(); col.classList.remove("over");
+      const [id, from] = (e.dataTransfer.getData("text/plain") || "").split("|");
+      if (!id || from === cat.id) return;
+      const cats = amCatsDe(id);
+      if (cats.includes(cat.id)) { amSetCats(id, cats.filter(c => c !== from)); }
+      else { amSetCats(id, cats.map(c => c === from ? cat.id : c)); }
+      renderAmelio();
+    });
+    board.appendChild(col);
+  });
+  amDetail();
+}
+
+function amCarte(it, catId) {
+  const { d, di, g } = it;
+  const e = entryFor(d, g);
+  const cats = amCatsDe(g.id);
+  const autre = cats.find(c => c !== catId);
+  const card = document.createElement("div");
+  card.className = "am-card" + (amSel === g.id ? " sel" : "");
+  card.draggable = true;
+  card.style.borderLeftColor = CAP_PALETTE[di % CAP_PALETTE.length];
+  card.innerHTML =
+    `<div class="dept">${d.nom}</div><div class="t"><span class="id">${g.id}</span>${g.titre}</div><div class="meta"></div>`;
+  const meta = card.querySelector(".meta");
+  if (e.projet) meta.innerHTML += `<span class="am-chip st ${amStatutClass(e.projet.statut)}">${e.projet.statut}</span>`;
+  if ((e.pistes || []).length) meta.innerHTML += `<span class="am-chip pistes">${e.pistes.length} piste${e.pistes.length > 1 ? "s" : ""}</span>`;
+  if (autre) { const c = AM_CATS.find(x => x.id === autre); meta.innerHTML += `<span class="am-chip" title="Aussi classé dans : ${c.nom}">aussi : ${c.nom}</span>`; }
+  card.addEventListener("click", () => { amSel = amSel === g.id ? null : g.id; document.querySelectorAll("#am-board .am-card").forEach(x => x.classList.toggle("sel", x.dataset.id === amSel)); amDetail(); });
+  card.dataset.id = g.id;
+  card.addEventListener("dragstart", ev => { ev.dataTransfer.setData("text/plain", g.id + "|" + catId); card.classList.add("drag"); });
+  card.addEventListener("dragend", () => card.classList.remove("drag"));
+  return card;
+}
+
+function amDetail() {
+  const det = document.getElementById("am-detail");
+  const it = amSel && amIndex.find(x => x.g.id === amSel);
+  if (!it) { det.classList.remove("open"); det.innerHTML = ""; return; }
+  const { d, dg, g } = it;
+  const e = entryFor(d, g);
+  det.innerHTML = "";
+
+  const close = document.createElement("button"); close.className = "am-close-detail"; close.textContent = "✕"; close.title = "Fermer le détail";
+  close.addEventListener("click", () => { amSel = null; document.querySelectorAll("#am-board .am-card.sel").forEach(x => x.classList.remove("sel")); amDetail(); });
+  det.appendChild(close);
+
+  const head = document.createElement("div");
+  head.innerHTML =
+    `<div class="kicker">Goulot ${g.id}</div><h3>${g.titre}</h3><div class="dept">${d.nom} · ${diagLabel(dg)}</div>` +
+    `<p>${g.detail || ""}</p>` + (g.citation ? `<blockquote>« ${g.citation} »</blockquote>` : "") +
+    (g.cause ? `<div class="kicker">Cause</div><p>${g.cause}</p>` : "") +
+    ((g.pourquoi || []).length ? `<div class="kicker">Cinq pourquoi</div><ul class="pourquoi">${g.pourquoi.map(x => `<li>${x}</li>`).join("")}</ul>` : "");
+  det.appendChild(head);
+
+  /* Catégories de piste : une ou deux, modifiables */
+  const sep0 = document.createElement("div"); sep0.className = "sep2"; det.appendChild(sep0);
+  const ck = document.createElement("div"); ck.className = "kicker"; ck.textContent = "Catégories de piste"; det.appendChild(ck);
+  const hint = document.createElement("div"); hint.className = "am-hint"; hint.textContent = "Au plus deux catégories par goulot."; det.appendChild(hint);
+  const cats = amCatsDe(g.id);
+  const box = document.createElement("div"); box.className = "am-cats";
+  AM_CATS.forEach(c => {
+    const lab = document.createElement("label"); lab.className = cats.includes(c.id) ? "on" : "";
+    const inp = document.createElement("input"); inp.type = "checkbox"; inp.checked = cats.includes(c.id);
+    inp.addEventListener("change", () => {
+      let cur = amCatsDe(g.id);
+      if (inp.checked) { cur = [...cur, c.id]; if (cur.length > 2) cur = cur.slice(-2); }
+      else { cur = cur.filter(x => x !== c.id); }
+      amSetCats(g.id, cur); renderAmelio();
+    });
+    lab.appendChild(inp); lab.appendChild(document.createTextNode(c.nom));
+    box.appendChild(lab);
+  });
+  det.appendChild(box);
+
+  /* Pistes déjà notées dans les diagnostics */
+  const sep1 = document.createElement("div"); sep1.className = "sep2"; det.appendChild(sep1);
+  const pk = document.createElement("div"); pk.className = "kicker"; pk.textContent = "Pistes d'amélioration continue"; det.appendChild(pk);
+  const ul = document.createElement("ul"); ul.className = "pistes";
+  const drawPistes = () => {
+    ul.innerHTML = "";
+    if (!e.pistes.length) ul.innerHTML = `<li><span style="color:rgba(13,13,13,.5);font-style:italic">Aucune piste pour l'instant.</span></li>`;
+    e.pistes.forEach((txt, i) => {
+      const li = document.createElement("li"); li.innerHTML = `<span>${txt}</span>`;
+      const del = document.createElement("button"); del.textContent = "✕"; del.title = "Retirer cette piste";
+      del.addEventListener("click", () => { e.pistes.splice(i, 1); setEntry(d, g, e); drawPistes(); amRafraichirCartes(); });
+      li.appendChild(del); ul.appendChild(li);
+    });
+  };
+  drawPistes(); det.appendChild(ul);
+  const add = document.createElement("div"); add.className = "piste-add";
+  const inp = document.createElement("input"); inp.placeholder = "Ajouter une piste d'amélioration…";
+  const btn = document.createElement("button"); btn.className = "btn"; btn.textContent = "Ajouter";
+  const commit = () => { const v = inp.value.trim(); if (!v) return; e.pistes.push(v); setEntry(d, g, e); inp.value = ""; drawPistes(); amRafraichirCartes(); };
+  btn.addEventListener("click", commit); inp.addEventListener("keydown", ev => { if (ev.key === "Enter") commit(); });
+  add.appendChild(inp); add.appendChild(btn); det.appendChild(add);
+
+  /* Projet d'amélioration : même stockage que la vue Diagnostics */
+  const sep2 = document.createElement("div"); sep2.className = "sep2"; det.appendChild(sep2);
+  const pjk = document.createElement("div"); pjk.className = "kicker"; pjk.textContent = "Projet d'amélioration"; det.appendChild(pjk);
+  const projHost = document.createElement("div"); det.appendChild(projHost);
+  const drawProjet = (editing) => {
+    projHost.innerHTML = "";
+    if (!e.projet && !editing) {
+      const b = document.createElement("button"); b.className = "btn"; b.textContent = "Créer un projet d'amélioration";
+      b.addEventListener("click", () => drawProjet(true)); projHost.appendChild(b); return;
+    }
+    const pr = e.projet || { titre: "Améliorer : " + g.titre, responsable: "", echeance: "", statut: "À planifier", objectif: "" };
+    const bx = document.createElement("div"); bx.className = "projet";
+    if (editing) {
+      bx.innerHTML =
+        `<div class="kicker">${e.projet ? "Modifier le projet" : "Nouveau projet"}</div><div class="grid">` +
+        `<div class="full"><label>Titre</label><input class="pj-titre" value="${pr.titre.replace(/"/g, "&quot;")}"></div>` +
+        `<div><label>Responsable</label><input class="pj-resp" value="${(pr.responsable || "").replace(/"/g, "&quot;")}"></div>` +
+        `<div><label>Échéance</label><input class="pj-ech" type="date" value="${pr.echeance || ""}"></div>` +
+        `<div class="full"><label>Statut</label><select class="pj-statut">` +
+        ["À planifier", "En cours", "En attente", "Terminé"].map(o => `<option${o === pr.statut ? " selected" : ""}>${o}</option>`).join("") +
+        `</select></div>` +
+        `<div class="full"><label>Objectif du projet</label><textarea class="pj-obj" rows="3">${pr.objectif || ""}</textarea></div>` +
+        `</div><div class="actions"></div>`;
+      const act = bx.querySelector(".actions");
+      const cancel = document.createElement("button"); cancel.className = "btn ghost"; cancel.textContent = "Annuler";
+      cancel.addEventListener("click", () => drawProjet(false));
+      const save = document.createElement("button"); save.className = "btn"; save.textContent = "Enregistrer";
+      save.addEventListener("click", () => {
+        e.projet = {
+          titre: bx.querySelector(".pj-titre").value.trim() || pr.titre,
+          responsable: bx.querySelector(".pj-resp").value.trim(),
+          echeance: bx.querySelector(".pj-ech").value,
+          statut: bx.querySelector(".pj-statut").value,
+          objectif: bx.querySelector(".pj-obj").value.trim(),
+          cree: e.projet && e.projet.cree ? e.projet.cree : new Date().toISOString().slice(0, 10),
+        };
+        setEntry(d, g, e); drawProjet(false); amRafraichirCartes();
+      });
+      act.appendChild(cancel); act.appendChild(save);
+    } else {
+      bx.innerHTML =
+        `<div class="kicker">Projet créé le ${pr.cree}<span class="statut">${pr.statut}</span></div>` +
+        `<h3 style="font-size:16px;margin:6px 0 10px;color:#fff">${pr.titre}</h3><div class="grid">` +
+        `<div><label>Responsable</label>${pr.responsable || "—"}</div><div><label>Échéance</label>${pr.echeance || "—"}</div>` +
+        (pr.objectif ? `<div class="full"><label>Objectif</label>${pr.objectif}</div>` : "") +
+        `</div><div class="actions"></div>`;
+      const act = bx.querySelector(".actions");
+      const del = document.createElement("button"); del.className = "btn ghost"; del.textContent = "Supprimer"; del.style.color = "#fff";
+      del.addEventListener("click", () => { e.projet = null; setEntry(d, g, e); drawProjet(false); amRafraichirCartes(); });
+      const edit = document.createElement("button"); edit.className = "btn"; edit.textContent = "Modifier";
+      edit.addEventListener("click", () => drawProjet(true));
+      act.appendChild(del); act.appendChild(edit);
+    }
+    projHost.appendChild(bx);
+  };
+  drawProjet(false);
+  det.classList.add("open");
+}
+
+/* Redessine le tableau sans perdre le détail ouvert */
+function amRafraichirCartes() {
+  const det = document.getElementById("am-detail");
+  const scroll = det.scrollTop;
+  const keep = amSel;
+  renderAmelio();
+  amSel = keep;
+  det.scrollTop = scroll;
+}
+
+function openAmelio() {
+  closeRapport(); closeCapacite();
+  globauxEl.querySelectorAll(".glob").forEach(x => x.classList.remove("active"));
+  sceneEl.style.display = "none";
+  labelsEl.style.display = "none";
+  footerEl.style.display = "none";
+  headerEl.style.display = "none";
+  amEl.classList.add("open");
+  amBtn.classList.add("active");
+  renderAmelio();
+}
+function closeAmelio() {
+  if (!amEl.classList.contains("open")) return;
+  amEl.classList.remove("open");
+  amBtn.classList.remove("active");
+  sceneEl.style.display = "";
+  labelsEl.style.display = "";
+  footerEl.style.display = "";
+  headerEl.style.display = "";
+}
+amBtn.addEventListener("click", () => { if (amEl.classList.contains("open")) closeAmelio(); else openAmelio(); });
+document.getElementById("am-close").addEventListener("click", closeAmelio);
+
 document.getElementById("close").addEventListener("click", closeSelection);
 addEventListener("keydown", e => {
   if (e.key !== "Escape") return;
@@ -4018,6 +4462,7 @@ addEventListener("keydown", e => {
   if (popup.classList.contains("open")) closePopup();
   else if (rapportEl.classList.contains("open")) closeRapport();
   else if (capEl.classList.contains("open")) closeCapacite();
+  else if (amEl.classList.contains("open")) closeAmelio();
   else if (dashEl.classList.contains("open")) closeDash();
   else if (diagEl.classList.contains("open")) closeDiag();
   else if (epcEl.classList.contains("open")) closeEPC();
