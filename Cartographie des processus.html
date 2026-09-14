@@ -888,9 +888,11 @@
   .rap-ecart.na{border-style:dashed;}
   .rap-dept{flex:1 1 520px;max-width:none;}
   .rap-row{display:flex;gap:10px;align-items:stretch;}
-  .rap-b{flex:1 1 0;min-width:max-content;}
-  .rap-b .chips{flex-wrap:nowrap;}
+  .rap-b{flex:1 1 0;min-width:0;}
+  .rap-b .chips{flex-wrap:wrap;row-gap:6px;}
   .rap-b .ch{white-space:nowrap;overflow:visible;}
+  .rap-row{flex-wrap:wrap;}
+  .rap-row .rap-b{flex:1 1 180px;}
   .rap-depts{align-items:flex-start;}
   .rap-b .chips{align-items:center;}
   .rap-src{
