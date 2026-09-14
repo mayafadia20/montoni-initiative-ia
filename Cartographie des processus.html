@@ -105,6 +105,7 @@
     transition:background .15s,border-color .15s;
   }
   .obj:hover{background:rgba(129,144,122,.18);}
+  .obj.has{border-left-color:#81907a;}
   .obj.active{border-left-color:#81907a;background:rgba(129,144,122,.28);}
   .obj .num{color:#81907a;font-weight:700;margin-right:8px;}
   .obj .chev{float:right;color:rgba(255,255,255,.45);font-size:12px;margin-top:2px;transition:transform .2s;}
@@ -122,8 +123,9 @@
     padding:7px 9px;
     font-size:13px;line-height:1.35;
     color:rgba(255,255,255,.88);cursor:pointer;position:relative;
-    transition:background .15s;
+    transition:background .15s;border-left:3px solid transparent;
   }
+  .ind.has{border-left-color:#81907a;}
   .ind::before{
     content:"";position:absolute;left:-15px;top:50%;
     width:10px;height:1px;background:rgba(129,144,122,.7);
@@ -2823,6 +2825,10 @@ function closeSelection() {
   closeDiag();
 }
 
+/* Un indicateur est documenté si sa cible ou sa valeur réelle contient une donnée (et non « Aucune… ») */
+function valeurDocumentee(v) { return !!(v && String(v).trim()) && !/^\s*aucun/i.test(String(v)); }
+function indDocumente(ind) { return valeurDocumentee(ind.cible) || valeurDocumentee(ind.reel); }
+
 function renderPanel(d) {
   document.getElementById("panel-titre").textContent = d.titre || d.nom;
   const noteEl = document.getElementById("panel-note");
@@ -2835,7 +2841,7 @@ function renderPanel(d) {
   objsEl.innerHTML = "";
   d.objectifs.forEach((o, oi) => {
     const btn = document.createElement("button");
-    btn.className = "obj";
+    btn.className = "obj" + (o.indicateurs.length ? " has" : "");
     btn.innerHTML = `<span class="num">${oi + 1}</span>${o.titre}<span class="chev">▶</span>`;
 
     const inds = document.createElement("div");
@@ -2849,7 +2855,7 @@ function renderPanel(d) {
     } else {
       o.indicateurs.forEach(ind => {
         const b = document.createElement("button");
-        b.className = "ind";
+        b.className = "ind" + (indDocumente(ind) ? " has" : "");
         b.textContent = ind.nom;
         b.addEventListener("click", () => {
           inds.querySelectorAll(".ind").forEach(x => x.classList.remove("active"));
