@@ -634,6 +634,71 @@
   .glob .t{display:block;font-size:12px;color:rgba(255,255,255,.75);margin-top:3px;line-height:1.35;}
   .glob.active .t{color:#fff;}
 
+  /* ---------- Capacité des ressources : cartographie des employés ---------- */
+  #capacite{
+    position:fixed;top:0;left:400px;right:0;bottom:0;display:none;flex-direction:column;
+    background:#fff;color:#0d0d0d;z-index:4;
+  }
+  #capacite.open{display:flex;}
+  #cap-close{
+    width:36px;height:36px;border-radius:50%;border:1px solid rgba(13,13,13,.25);background:#fff;color:#0d0d0d;
+    font-size:18px;line-height:1;cursor:pointer;
+  }
+  #cap-close:hover{background:#81907a;color:#fff;border-color:#81907a;}
+  .cap-body{flex:1;display:flex;min-height:0;}
+  .cap-side{
+    width:250px;flex:0 0 250px;border-right:1px solid rgba(13,13,13,.1);padding:22px 20px 30px;overflow-y:auto;
+    background:#f6f7f4;
+  }
+  .cap-side .kicker,.cap-detail .kicker{color:#81907a;margin-bottom:10px;}
+  .cap-side .blk{margin-bottom:26px;}
+  .cap-stat{font-size:11.5px;line-height:1.5;color:rgba(13,13,13,.65);}
+  .cap-stat b{display:block;font-size:22px;font-weight:700;color:#0d0d0d;line-height:1.1;}
+  .cap-leg{
+    display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:none;border:none;
+    padding:5px 6px;border-radius:4px;font-size:12px;color:#0d0d0d;cursor:pointer;line-height:1.3;
+  }
+  .cap-leg:hover{background:rgba(129,144,122,.14);}
+  .cap-leg.active{background:rgba(129,144,122,.28);font-weight:600;}
+  .cap-leg .dot{width:12px;height:12px;border-radius:50%;flex:0 0 12px;}
+  .cap-leg .n{margin-left:auto;font-size:11px;color:rgba(13,13,13,.5);}
+  .cap-sizes{display:flex;align-items:flex-end;gap:14px;padding:6px 4px 0;}
+  .cap-sizes div{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10.5px;color:rgba(13,13,13,.6);}
+  .cap-sizes span{display:block;border-radius:50%;background:#81907a;opacity:.85;}
+  .cap-chart{flex:1;min-width:0;overflow:auto;padding:24px 30px;position:relative;}
+  .cap-chart svg{display:block;margin:0 auto;max-width:100%;height:auto;}
+  .cap-bulle{cursor:pointer;transition:opacity .2s;}
+  .cap-bulle circle{stroke:#fff;stroke-width:1.5;}
+  .cap-bulle:hover circle{stroke:#0d0d0d;}
+  .cap-bulle.sel circle{stroke:#0d0d0d;stroke-width:2.5;}
+  .cap-bulle text{pointer-events:none;font-weight:600;}
+  .cap-bulle.dim{opacity:.18;}
+  .cap-tip{
+    position:fixed;pointer-events:none;background:#0d0d0d;color:#fff;border-radius:6px;padding:9px 12px;
+    font-size:12px;line-height:1.4;z-index:20;display:none;max-width:280px;box-shadow:0 4px 18px rgba(0,0,0,.25);
+  }
+  .cap-tip b{display:block;font-size:13px;}
+  .cap-tip .r{color:rgba(255,255,255,.7);font-size:11px;}
+  .cap-tip .c{margin-top:5px;color:#c7d1c2;font-weight:600;}
+  .cap-detail{
+    width:330px;flex:0 0 330px;border-left:1px solid rgba(13,13,13,.1);padding:22px 22px 30px;overflow-y:auto;
+    display:none;
+  }
+  .cap-detail.open{display:block;}
+  .cap-detail h3{font-size:19px;font-weight:700;line-height:1.2;margin:4px 0 2px;}
+  .cap-detail .role{font-size:12px;color:rgba(13,13,13,.6);line-height:1.4;}
+  .cap-detail .dept{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#566a4d;margin-top:6px;}
+  .cap-detail .big{font-size:40px;font-weight:700;line-height:1;margin:18px 0 2px;}
+  .cap-detail .big small{font-size:12px;font-weight:400;color:rgba(13,13,13,.6);margin-left:6px;letter-spacing:.06em;text-transform:uppercase;}
+  .cap-detail .sub{font-size:11.5px;color:rgba(13,13,13,.6);margin-bottom:14px;}
+  .cap-proc{border-top:1px solid rgba(13,13,13,.08);padding:10px 0;}
+  .cap-proc .pn{font-size:12.5px;font-weight:600;line-height:1.3;}
+  .cap-proc .pd{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(13,13,13,.5);margin:2px 0 6px;}
+  .cap-proc ul{list-style:none;padding:0;margin:0;}
+  .cap-proc li{font-size:11.5px;line-height:1.4;padding:2px 0 2px 12px;position:relative;color:rgba(13,13,13,.8);}
+  .cap-proc li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:50%;background:#81907a;}
+  .cap-empty{font-size:12px;color:rgba(13,13,13,.55);line-height:1.5;}
+  .cap-note{font-size:11px;color:rgba(13,13,13,.5);line-height:1.5;margin-top:14px;}
   #rapport{
     position:fixed;top:0;left:400px;right:0;bottom:0;display:none;flex-direction:column;
     background:#fff;color:#0d0d0d;z-index:4;
@@ -798,6 +863,7 @@
   <div class="sep"></div>
   <button class="menu-item" id="menu-rapport">Rapport des objectifs</button>
   <div id="globaux"></div>
+  <button class="menu-item" id="menu-capacite">Capacité des ressources</button>
 </aside>
 
 <section id="rapport">
@@ -811,6 +877,23 @@
   </div>
   <div class="rap-scroll"><div class="rap-map" id="rap-map"></div></div>
 </section>
+
+<section id="capacite">
+  <div class="epc-head">
+    <div>
+      <div class="kicker">Capacité des ressources</div>
+      <h2>Cartographie des employés</h2>
+      <div class="epc-dept">Plus la bulle est grande, plus la personne intervient dans un grand nombre d'étapes de processus</div>
+    </div>
+    <button id="cap-close" title="Revenir à la scène">✕</button>
+  </div>
+  <div class="cap-body">
+    <div class="cap-side" id="cap-side"></div>
+    <div class="cap-chart" id="cap-chart"></div>
+    <div class="cap-detail" id="cap-detail"></div>
+  </div>
+</section>
+<div class="cap-tip" id="cap-tip"></div>
 
 <div id="scene"></div>
 <div id="labels"></div>
@@ -3558,6 +3641,7 @@ function openDash() {
 function closeDash() {
   dashEl.classList.remove("open");
   closeRapport();
+  closeCapacite();
   globauxEl.classList.remove("open");
   document.getElementById("menu-rapport").classList.remove("active");
 }
@@ -3588,6 +3672,7 @@ function renderGlobaux() {
 }
 
 function openRapport(g) {
+  closeCapacite();
   document.getElementById("rap-titre").textContent = g.chiffre + " " + g.titre;
   document.getElementById("rap-source").textContent = g.source;
   const map = document.getElementById("rap-map");
@@ -3671,6 +3756,258 @@ function closeRapport() {
 }
 document.getElementById("rap-close").addEventListener("click", closeRapport);
 
+/* ---------------------------------------------------------------------
+   Capacité des ressources : cartographie des employés en bulles.
+   La taille de chaque bulle est proportionnelle au nombre d'étapes de
+   processus où la personne est nommée dans le champ « qui ».
+   --------------------------------------------------------------------- */
+const capEl = document.getElementById("capacite");
+const capBtn = document.getElementById("menu-capacite");
+const capTip = document.getElementById("cap-tip");
+let capData = null, capSelDept = null, capSelPers = null;
+
+const CAP_PALETTE = ["#81907a","#566a4d","#a8894f","#6f8fa6","#b3675c","#8a6f9e","#5c8f8a","#c2a24a",
+                     "#7a7f86","#a06b7f","#4f7a9c","#9a8c6b","#6b9a6b","#b58a6c","#5e6e8c","#9c7a5e"];
+const CAP_ALIAS = { "Alex": "Alexandre Bouchard", "Taylor": "Tayler Bento-Cabral" };
+const CAP_EXTRA = [ { nom: "Dario Montoni" }, { nom: "Arlene" }, { nom: "Sylvie" } ];
+const CAP_NON_PERSONNE = /^(\d|Équipe|Employés|Adjointes|Surintendants|autre)/i;
+const CAP_HORS = "Hors organigramme relevé";
+
+function capEsc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+function capWord(nom) { return new RegExp("(^|[^\\p{L}])" + capEsc(nom) + "(?=$|[^\\p{L}])", "u"); }
+
+/* Construit la liste des personnes à partir des organigrammes (rh) de chaque département */
+function capPersonnes() {
+  const map = new Map();
+  DEPARTEMENTS.forEach((d, di) => {
+    const walk = n => {
+      if (!CAP_NON_PERSONNE.test(n.nom)) {
+        if (!map.has(n.nom)) map.set(n.nom, { nom: n.nom, role: n.role || "", dept: d.nom, di, depts: [] });
+        map.get(n.nom).depts.push(d.nom);
+      }
+      (n.enfants || []).forEach(walk);
+    };
+    (d.rh || []).forEach(walk);
+  });
+  CAP_EXTRA.forEach(p => { if (!map.has(p.nom)) map.set(p.nom, { nom: p.nom, role: "", dept: null, di: -1, depts: [] }); });
+  return [...map.values()];
+}
+
+/* Repère les personnes nommées dans un champ « qui » d'une étape */
+function capMatch(qui, personnes) {
+  let s = " " + qui + " ";
+  for (const a in CAP_ALIAS) s = s.replace(capWord(a), (m, pre) => pre + CAP_ALIAS[a]);
+  const out = [];
+  const pleins = personnes.filter(p => p.nom.includes(" ")).sort((a, b) => b.nom.length - a.nom.length);
+  for (const p of pleins) {
+    if (s.includes(p.nom)) { out.push(p); s = s.split(p.nom).join(" "); }
+  }
+  for (const p of personnes) {
+    if (p.nom.includes(" ")) continue;
+    if (capWord(p.nom).test(s)) out.push(p);
+  }
+  return out;
+}
+
+function capCalculer() {
+  const personnes = capPersonnes();
+  const compte = new Map();
+  let etapes = 0, sansNom = 0;
+  DEPARTEMENTS.forEach(d => {
+    (d.processus || []).forEach(pr => {
+      (pr.etapes || []).forEach(et => {
+        etapes++;
+        const trouves = capMatch(et.qui || "", personnes);
+        if (!trouves.length) sansNom++;
+        trouves.forEach(p => {
+          if (!compte.has(p.nom)) compte.set(p.nom, { ...p, n: 0, procs: new Map() });
+          const c = compte.get(p.nom);
+          c.n++;
+          const k = d.nom + " › " + pr.nom;
+          if (!c.procs.has(k)) c.procs.set(k, { dept: d.nom, proc: pr.nom, etapes: [] });
+          c.procs.get(k).etapes.push(et.etape);
+        });
+      });
+    });
+  });
+  const liste = [...compte.values()].sort((a, b) => b.n - a.n || a.nom.localeCompare(b.nom));
+  return { liste, etapes, sansNom };
+}
+
+/* Empilement de cercles : les plus grosses bulles au centre, les autres au plus près */
+function capPacker(liste, rMax) {
+  const maxN = Math.max(...liste.map(p => p.n));
+  const k = rMax / Math.sqrt(maxN);
+  const cercles = liste.map(p => ({ p, r: Math.max(11, k * Math.sqrt(p.n)), x: 0, y: 0 }));
+  const gap = 3;
+  cercles.forEach((c, i) => {
+    if (i === 0) return;
+    let place = null, meilleur = Infinity;
+    for (let R = 0; R < 2000 && place === null; R += 3) {
+      const nb = Math.max(12, Math.round(R / 3));
+      for (let a = 0; a < nb; a++) {
+        const th = (a / nb) * Math.PI * 2 + i * 0.7;
+        const x = R * Math.cos(th), y = R * Math.sin(th) * 0.78;
+        let ok = true;
+        for (let j = 0; j < i; j++) {
+          const o = cercles[j], dx = o.x - x, dy = o.y - y;
+          if (dx * dx + dy * dy < (o.r + c.r + gap) ** 2) { ok = false; break; }
+        }
+        if (ok) { const d = x * x + y * y; if (d < meilleur) { meilleur = d; place = { x, y }; } }
+      }
+    }
+    c.x = place ? place.x : 0; c.y = place ? place.y : 0;
+  });
+  return cercles;
+}
+
+function capCouleur(p) { return p.di >= 0 ? CAP_PALETTE[p.di % CAP_PALETTE.length] : "#c9c4b8"; }
+function capTexte(hex) {
+  const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+  return (0.299 * r + 0.587 * g + 0.114 * b) > 165 ? "#0d0d0d" : "#fff";
+}
+function capInitiales(nom) { return nom.split(/[\s-]+/).filter(Boolean).map(w => w[0]).join("").slice(0, 3).toUpperCase(); }
+
+function renderCapacite() {
+  if (!capData) capData = capCalculer();
+  const { liste, etapes, sansNom } = capData;
+  const chart = document.getElementById("cap-chart");
+  const side = document.getElementById("cap-side");
+  chart.innerHTML = ""; side.innerHTML = "";
+  if (!liste.length) { chart.innerHTML = '<div class="cap-empty">Aucune personne nommée dans les étapes de processus.</div>'; return; }
+
+  const R_MAX = 78;
+  const cercles = capPacker(liste, R_MAX);
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  cercles.forEach(c => { minX = Math.min(minX, c.x - c.r); minY = Math.min(minY, c.y - c.r); maxX = Math.max(maxX, c.x + c.r); maxY = Math.max(maxY, c.y + c.r); });
+  const pad = 16, W = maxX - minX + pad * 2, H = maxY - minY + pad * 2;
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W.toFixed(0)} ${H.toFixed(0)}`);
+  svg.setAttribute("width", W.toFixed(0)); svg.setAttribute("height", H.toFixed(0));
+  svg.setAttribute("role", "img"); svg.setAttribute("aria-label", "Cartographie des employés selon leur implication dans les étapes de processus");
+
+  cercles.forEach(c => {
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("class", "cap-bulle");
+    g.dataset.nom = c.p.nom; g.dataset.dept = c.p.dept || CAP_HORS;
+    const cx = c.x - minX + pad, cy = c.y - minY + pad, fill = capCouleur(c.p);
+    const ci = document.createElementNS(NS, "circle");
+    ci.setAttribute("cx", cx); ci.setAttribute("cy", cy); ci.setAttribute("r", c.r); ci.setAttribute("fill", fill);
+    g.appendChild(ci);
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", cx); t.setAttribute("text-anchor", "middle"); t.setAttribute("fill", capTexte(fill));
+    const parts = c.p.nom.split(" ");
+    if (c.r >= 34 && parts.length > 1) {
+      t.setAttribute("y", cy - 2); t.setAttribute("font-size", Math.min(13, c.r / 3.2));
+      const l1 = document.createElementNS(NS, "tspan"); l1.setAttribute("x", cx); l1.textContent = parts[0];
+      const l2 = document.createElementNS(NS, "tspan"); l2.setAttribute("x", cx); l2.setAttribute("dy", "1.15em"); l2.textContent = parts.slice(1).join(" ");
+      t.appendChild(l1); t.appendChild(l2);
+      const n = document.createElementNS(NS, "tspan"); n.setAttribute("x", cx); n.setAttribute("dy", "1.3em"); n.setAttribute("font-weight", "400"); n.setAttribute("font-size", Math.min(11, c.r / 4)); n.textContent = c.p.n + " étapes";
+      t.appendChild(n);
+    } else if (c.r >= 34) {
+      t.setAttribute("y", cy + 4); t.setAttribute("font-size", Math.min(13, c.r / 3.2)); t.textContent = c.p.nom;
+    } else if (c.r >= 15) {
+      t.setAttribute("y", cy + 3.5); t.setAttribute("font-size", Math.max(8, c.r / 2.4)); t.textContent = capInitiales(c.p.nom);
+    }
+    g.appendChild(t);
+    g.addEventListener("mousemove", e => {
+      const sep = c.p.role && c.p.dept ? " · " : "";
+      capTip.innerHTML = `<b>${c.p.nom}</b><span class="r">${c.p.role || ""}${sep}${c.p.dept || ""}</span><div class="c">${c.p.n} étape${c.p.n > 1 ? "s" : ""} · ${c.p.procs.size} processus</div>`;
+      capTip.style.display = "block";
+      capTip.style.left = Math.min(innerWidth - 300, e.clientX + 14) + "px";
+      capTip.style.top = (e.clientY + 14) + "px";
+    });
+    g.addEventListener("mouseleave", () => { capTip.style.display = "none"; });
+    g.addEventListener("click", () => { capSelPers = capSelPers === c.p.nom ? null : c.p.nom; capDetail(); capFiltrer(); });
+    svg.appendChild(g);
+  });
+  chart.appendChild(svg);
+
+  /* Colonne de gauche : statistiques, légende des départements, échelle des tailles */
+  const depts = new Map();
+  liste.forEach(p => { const k = p.dept || CAP_HORS; depts.set(k, (depts.get(k) || 0) + 1); });
+  const stat = document.createElement("div"); stat.className = "blk";
+  stat.innerHTML = `<div class="kicker">Vue d'ensemble</div>
+    <div class="cap-stat"><b>${liste.length}</b>personnes nommées dans au moins une étape</div>
+    <div class="cap-stat" style="margin-top:10px"><b>${etapes}</b>étapes de processus cartographiées</div>
+    <div class="cap-stat" style="margin-top:10px"><b>${sansNom}</b>étapes attribuées à un rôle ou une équipe sans personne nommée</div>`;
+  side.appendChild(stat);
+
+  const leg = document.createElement("div"); leg.className = "blk";
+  leg.innerHTML = '<div class="kicker">Départements</div>';
+  const ordre = DEPARTEMENTS.map(d => d.nom).filter(n => depts.has(n));
+  if (depts.has(CAP_HORS)) ordre.push(CAP_HORS);
+  ordre.forEach(n => {
+    const b = document.createElement("button"); b.className = "cap-leg" + (capSelDept === n ? " active" : "");
+    const di = DEPARTEMENTS.findIndex(d => d.nom === n);
+    b.innerHTML = `<span class="dot" style="background:${di >= 0 ? CAP_PALETTE[di % CAP_PALETTE.length] : "#c9c4b8"}"></span><span>${n}</span><span class="n">${depts.get(n)}</span>`;
+    b.addEventListener("click", () => {
+      capSelDept = capSelDept === n ? null : n;
+      side.querySelectorAll(".cap-leg").forEach(x => x.classList.toggle("active", x === b && capSelDept === n));
+      capFiltrer();
+    });
+    leg.appendChild(b);
+  });
+  side.appendChild(leg);
+
+  const maxN = liste[0].n, k = R_MAX / Math.sqrt(maxN);
+  const tailles = [1, Math.round(maxN / 2), maxN].filter((v, i, a) => a.indexOf(v) === i);
+  const sz = document.createElement("div"); sz.className = "blk";
+  sz.innerHTML = '<div class="kicker">Échelle</div><div class="cap-sizes">' +
+    tailles.map(v => { const d = Math.max(11, k * Math.sqrt(v)) * 2 * 0.55; return `<div><span style="width:${d}px;height:${d}px"></span>${v} étape${v > 1 ? "s" : ""}</div>`; }).join("") +
+    "</div><div class=\"cap-note\">Une personne compte une fois par étape où elle est nommée, y compris lorsque l’attribution reste à confirmer. Cliquer une bulle pour voir le détail, un département pour le mettre en évidence.</div>";
+  side.appendChild(sz);
+
+  capDetail(); capFiltrer();
+}
+
+function capFiltrer() {
+  document.querySelectorAll("#cap-chart .cap-bulle").forEach(g => {
+    const okDept = !capSelDept || g.dataset.dept === capSelDept;
+    g.classList.toggle("dim", !okDept);
+    g.classList.toggle("sel", capSelPers === g.dataset.nom);
+  });
+}
+
+function capDetail() {
+  const det = document.getElementById("cap-detail");
+  const p = capSelPers && capData.liste.find(x => x.nom === capSelPers);
+  if (!p) { det.classList.remove("open"); det.innerHTML = ""; return; }
+  const procs = [...p.procs.values()];
+  const nbDepts = new Set(procs.map(x => x.dept)).size;
+  det.innerHTML = `<div class="kicker">Personne</div><h3>${p.nom}</h3><div class="role">${p.role || "Rôle non relevé"}</div>
+    <div class="dept">${p.depts.length ? p.depts.join(" · ") : CAP_HORS}</div>
+    <div class="big">${p.n}<small>étape${p.n > 1 ? "s" : ""}</small></div>
+    <div class="sub">dans ${procs.length} processus, ${nbDepts} département${nbDepts > 1 ? "s" : ""}</div>` +
+    procs.map(x => `<div class="cap-proc"><div class="pn">${x.proc}</div><div class="pd">${x.dept}</div><ul>${x.etapes.map(e => `<li>${e}</li>`).join("")}</ul></div>`).join("");
+  det.classList.add("open");
+}
+
+function openCapacite() {
+  closeRapport();
+  globauxEl.querySelectorAll(".glob").forEach(x => x.classList.remove("active"));
+  sceneEl.style.display = "none";
+  labelsEl.style.display = "none";
+  footerEl.style.display = "none";
+  headerEl.style.display = "none";
+  capEl.classList.add("open");
+  capBtn.classList.add("active");
+  renderCapacite();
+}
+function closeCapacite() {
+  if (!capEl.classList.contains("open")) return;
+  capEl.classList.remove("open");
+  capBtn.classList.remove("active");
+  capTip.style.display = "none";
+  sceneEl.style.display = "";
+  labelsEl.style.display = "";
+  footerEl.style.display = "";
+  headerEl.style.display = "";
+}
+capBtn.addEventListener("click", () => { if (capEl.classList.contains("open")) closeCapacite(); else openCapacite(); });
+document.getElementById("cap-close").addEventListener("click", closeCapacite);
+
 document.getElementById("close").addEventListener("click", closeSelection);
 addEventListener("keydown", e => {
   if (e.key !== "Escape") return;
@@ -3680,6 +4017,7 @@ addEventListener("keydown", e => {
   }
   if (popup.classList.contains("open")) closePopup();
   else if (rapportEl.classList.contains("open")) closeRapport();
+  else if (capEl.classList.contains("open")) closeCapacite();
   else if (dashEl.classList.contains("open")) closeDash();
   else if (diagEl.classList.contains("open")) closeDiag();
   else if (epcEl.classList.contains("open")) closeEPC();
