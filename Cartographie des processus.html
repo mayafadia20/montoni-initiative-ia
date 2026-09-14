@@ -772,6 +772,17 @@
   .w-link{display:flex;flex-direction:column;align-items:center;height:34px;justify-content:center;position:relative;}
   .w-link::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;background:#81907a;}
   .w-link span{position:relative;background:#fff;padding:0 8px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#81907a;}
+  .ovl.under{z-index:20;}
+  .rap-ecart .rap-src.rap-gl{margin-left:2px;}
+  #e-ecart{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+  #e-ecart .ch{display:inline-block;border-radius:12px;padding:4px 9px;font-size:11.5px;line-height:1.3;white-space:nowrap;background:rgba(129,144,122,.18);color:#0d0d0d;}
+  #e-ecart .ch.val{background:#81907a;color:#fff;font-weight:700;}
+  #e-ecart .ch.val.defav{background:#d97b74;}
+  #e-ecart .why{font-size:10.5px;font-style:italic;color:rgba(13,13,13,.55);}
+  #e-tags .tag{font-family:inherit;}
+  #e-tags .tag.autre{border-color:#0d0d0d;}
+  #e-tags .tag.autre .id{color:#0d0d0d;}
+  #e-tags .tag .pd{display:block;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(13,13,13,.5);margin-top:2px;}
   #i-map{margin-top:14px;overflow-x:auto;}
   #i-map svg{width:100%;min-width:720px;height:auto;display:block;}
 </style>
@@ -937,6 +948,17 @@
       <button id="g-whys">Analyse des Pourquoi</button>
       <button id="g-ishi">Diagramme d'Ishikawa</button>
     </div>
+  </div>
+</div>
+<div id="egp" class="ovl under">
+  <div class="ovl-card">
+    <button class="ovl-close" data-close="egp" title="Fermer">✕</button>
+    <div class="kicker">Goulots d'étranglement liés à l'écart</div>
+    <div class="popup-title" id="e-titre"></div>
+    <div class="g-meta"><span class="chip dept" id="e-dept"></span><div class="chips" id="e-ecart"></div></div>
+    <div class="g-k">Goulots qui expliquent l'écart</div>
+    <div class="tags" id="e-tags"></div>
+    <div class="rap-none" style="margin-top:14px">Cliquer un goulot pour voir sa cause, l'analyse des pourquoi et le diagramme d'Ishikawa</div>
   </div>
 </div>
 <div id="whys" class="ovl">
@@ -1305,6 +1327,12 @@ const GLOBAUX = [
         "dept": "Investissement",
         "nom": "Acquisition d'un immeuble stabilisé"
        }
+      ],
+      "goulots": [
+       "2.8",
+       "2.12",
+       "2.6",
+       "2.7"
       ]
      },
      {
@@ -1339,6 +1367,12 @@ const GLOBAUX = [
         "dept": "Investissement",
         "nom": "Acquisition d'un immeuble stabilisé"
        }
+      ],
+      "goulots": [
+       "2.6",
+       "2.7",
+       "2.12",
+       "2.14"
       ]
      },
      {
@@ -1373,6 +1407,11 @@ const GLOBAUX = [
         "dept": "Investissement",
         "nom": "Acquisition d'un immeuble stabilisé"
        }
+      ],
+      "goulots": [
+       "2.12",
+       "2.7",
+       "2.5"
       ]
      },
      {
@@ -1407,6 +1446,12 @@ const GLOBAUX = [
         "dept": "Investissement",
         "nom": "Suivi du réel et reporting aux partenaires"
        }
+      ],
+      "goulots": [
+       "2.3",
+       "2.2",
+       "2.11",
+       "2.4"
       ]
      }
     ]
@@ -1461,6 +1506,13 @@ const GLOBAUX = [
         "dept": "Urbanisme",
         "nom": "Faisabilité réglementaire avant acquisition"
        }
+      ],
+      "goulots": [
+       "6.8",
+       "6.9",
+       "6.11",
+       "6.3",
+       "6.6"
       ]
      },
      {
@@ -1496,6 +1548,11 @@ const GLOBAUX = [
         "dept": "PSDT",
         "nom": "Entente de développement avec une ville"
        }
+      ],
+      "goulots": [
+       "6.11",
+       "6.10",
+       "6.5"
       ]
      }
     ]
@@ -1536,6 +1593,11 @@ const GLOBAUX = [
         "dept": "Urbanisme",
         "nom": "Analyse réglementaire d'un projet"
        }
+      ],
+      "goulots": [
+       "5.2",
+       "5.9",
+       "5.3"
       ]
      }
     ]
@@ -1586,6 +1648,13 @@ const GLOBAUX = [
         "dept": "Finance Construction",
         "nom": "Rapport financier mensuel"
        }
+      ],
+      "goulots": [
+       "4.1",
+       "3.7",
+       "4.5",
+       "13.1",
+       "1.5"
       ]
      },
      {
@@ -1618,6 +1687,12 @@ const GLOBAUX = [
         "dept": "Finance Construction",
         "nom": "Comptes payables"
        }
+      ],
+      "goulots": [
+       "13.6",
+       "13.7",
+       "4.6",
+       "13.2"
       ]
      },
      {
@@ -1652,6 +1727,10 @@ const GLOBAUX = [
         "dept": "Finance Construction",
         "nom": "Comptes payables"
        }
+      ],
+      "goulots": [
+       "13.6",
+       "13.7"
       ]
      },
      {
@@ -1684,6 +1763,12 @@ const GLOBAUX = [
         "dept": "Finance Construction",
         "nom": "Rapport financier mensuel"
        }
+      ],
+      "goulots": [
+       "13.4",
+       "13.2",
+       "13.5",
+       "13.3"
       ]
      }
     ]
@@ -1727,6 +1812,13 @@ const GLOBAUX = [
         "dept": "Estimation",
         "nom": "Procurement après le go"
        }
+      ],
+      "goulots": [
+       "3.7",
+       "3.5",
+       "3.9",
+       "3.1",
+       "1.4"
       ]
      },
      {
@@ -1761,6 +1853,11 @@ const GLOBAUX = [
         "dept": "Estimation",
         "nom": "Procurement après le go"
        }
+      ],
+      "goulots": [
+       "3.7",
+       "3.6",
+       "3.4"
       ]
      }
     ]
@@ -1802,6 +1899,13 @@ const GLOBAUX = [
         "dept": "Développement de projets",
         "nom": "Réponse à un appel d'offres client"
        }
+      ],
+      "goulots": [
+       "1.5",
+       "1.10",
+       "1.4",
+       "1.6",
+       "7.8"
       ]
      },
      {
@@ -1840,6 +1944,12 @@ const GLOBAUX = [
         "dept": "Estimation",
         "nom": "Soumission"
        }
+      ],
+      "goulots": [
+       "1.1",
+       "1.4",
+       "3.9",
+       "3.7"
       ]
      }
     ]
@@ -1879,6 +1989,13 @@ const GLOBAUX = [
         "dept": "Construction",
         "nom": "Exécution d'un projet"
        }
+      ],
+      "goulots": [
+       "4.1",
+       "4.4",
+       "4.3",
+       "1.12",
+       "1.6"
       ]
      },
      {
@@ -1913,6 +2030,10 @@ const GLOBAUX = [
         "dept": "Approvisionnement",
         "nom": "Achats groupés"
        }
+      ],
+      "goulots": [
+       "4.7",
+       "10.7"
       ]
      }
     ]
@@ -1952,6 +2073,12 @@ const GLOBAUX = [
         "dept": "Approvisionnement",
         "nom": "Commande de chantier"
        }
+      ],
+      "goulots": [
+       "10.1",
+       "10.2",
+       "10.3",
+       "10.6"
       ]
      }
     ]
@@ -2004,6 +2131,12 @@ const GLOBAUX = [
         "dept": "Location",
         "nom": "Prospection sortante"
        }
+      ],
+      "goulots": [
+       "9.8",
+       "9.9",
+       "9.7",
+       "9.2"
       ]
      },
      {
@@ -2036,6 +2169,11 @@ const GLOBAUX = [
         "dept": "Location",
         "nom": "Prospection sortante"
        }
+      ],
+      "goulots": [
+       "9.3",
+       "9.4",
+       "9.1"
       ]
      },
      {
@@ -2070,6 +2208,11 @@ const GLOBAUX = [
         "dept": "Location",
         "nom": "Prospection sortante"
        }
+      ],
+      "goulots": [
+       "9.1",
+       "9.5",
+       "9.2"
       ]
      },
      {
@@ -2104,6 +2247,12 @@ const GLOBAUX = [
         "dept": "Location",
         "nom": "Prospection sortante"
        }
+      ],
+      "goulots": [
+       "9.2",
+       "9.5",
+       "9.3",
+       "9.9"
       ]
      },
      {
@@ -2142,6 +2291,11 @@ const GLOBAUX = [
         "dept": "Location",
         "nom": "Prospection sortante"
        }
+      ],
+      "goulots": [
+       "9.9",
+       "9.7",
+       "9.8"
       ]
      }
     ]
@@ -2797,7 +2951,28 @@ document.getElementById("g-whys").addEventListener("click", openWhys);
 document.getElementById("g-ishi").addEventListener("click", openIshikawa);
 document.querySelectorAll(".ovl-close").forEach(b => b.addEventListener("click", () => document.getElementById(b.dataset.close).classList.remove("open")));
 document.querySelectorAll(".ovl").forEach(o => o.addEventListener("click", e => { if (e.target === o) o.classList.remove("open"); }));
-function closeOverlays() { ["ishi", "whys", "gpop"].forEach(id => document.getElementById(id).classList.remove("open")); }
+function closeOverlays() { ["ishi", "whys", "gpop", "egp"].forEach(id => document.getElementById(id).classList.remove("open")); }
+function openEcartGoulots(deptNom, it, defav) {
+  const dd = DEPARTEMENTS.find(x => x.nom === deptNom);
+  document.getElementById("e-titre").textContent = it.ind;
+  document.getElementById("e-dept").textContent = dd ? (dd.titre || dd.nom) : deptNom;
+  const m = it.ecart;
+  document.getElementById("e-ecart").innerHTML =
+    `<span class="ch val${defav ? " defav" : ""}">${valTxt(m)}</span><span class="ch">${m.u || "—"}</span><span class="ch">${m.p || "—"}</span>` +
+    (m.na ? `<span class="why">${m.na}</span>` : "");
+  const host = document.getElementById("e-tags");
+  host.innerHTML = "";
+  (it.goulots || []).forEach(id => {
+    const f = findGoulot(id); if (!f) return;
+    const b = document.createElement("button");
+    b.className = "tag" + (f.d.nom !== deptNom ? " autre" : "");
+    b.innerHTML = `<span class="id">${f.g.id}</span>${f.g.titre}` + (f.d.nom !== deptNom ? `<span class="pd">${f.d.titre || f.d.nom}</span>` : "");
+    b.addEventListener("click", () => openGoulot(f));
+    host.appendChild(b);
+  });
+  if (!(it.goulots || []).length) host.innerHTML = `<span class="rap-none">Aucun goulot rattaché</span>`;
+  document.getElementById("egp").classList.add("open");
+}
 
 function renderMesures(d, pr) {
   renderKpis(d, pr);
@@ -3447,7 +3622,8 @@ function openRapport(g) {
       const bloc = (cls, k, m, side) =>
         `<div class="rap-b ${cls}${m.na ? " na" : ""}${cls === "rap-ecart" && defav ? " defav" : ""}"${cls === "rap-ecart" && defav ? ' title="Écart en défaveur de l’objectif"' : ""}><span class="k">${k}</span>` +
         `<div class="chips"><span class="ch val">${val(m)}</span><span class="ch">${m.u || "—"}</span><span class="ch">${m.p || "—"}</span>` +
-        (side ? `<button class="rap-src" data-side="${side}" title="Voir la source">→</button>` : "") + `</div>` +
+        (side ? `<button class="rap-src" data-side="${side}" title="Voir la source">→</button>` : "") +
+        (cls === "rap-ecart" ? `<button class="rap-src rap-gl" title="Goulots d'étranglement liés à cet écart">→</button>` : "") + `</div>` +
         (m.na ? `<div class="why">${m.na}</div>` : "") + `</div>`;
       box.innerHTML =
         `<div class="lbl"><span>${it.ind}</span><button class="rap-plus" title="Processus liés à cet objectif">+</button></div>` +
@@ -3471,7 +3647,8 @@ function openRapport(g) {
         const on = procsEl.classList.toggle("open");
         plus.textContent = on ? "−" : "+";
       });
-      box.querySelectorAll(".rap-src").forEach(b =>
+      box.querySelector(".rap-gl").addEventListener("click", () => openEcartGoulots(l.dept, it, defav));
+      box.querySelectorAll(".rap-src:not(.rap-gl)").forEach(b =>
         b.addEventListener("click", () => openSourceRapport(l.dept, it.ind, b.dataset.side, b.dataset.side === "cible" ? it.cible : it.reel)));
       card.appendChild(box);
     });
@@ -3489,6 +3666,7 @@ function openRapport(g) {
 }
 function closeRapport() {
   if (!rapportEl.classList.contains("open")) return;
+  document.getElementById("egp").classList.remove("open");
   rapportEl.classList.remove("open");
   sceneEl.style.display = "";
   labelsEl.style.display = "";
@@ -3501,7 +3679,7 @@ document.getElementById("rap-close").addEventListener("click", closeRapport);
 document.getElementById("close").addEventListener("click", closeSelection);
 addEventListener("keydown", e => {
   if (e.key !== "Escape") return;
-  for (const id of ["ishi", "whys", "gpop"]) {
+  for (const id of ["ishi", "whys", "gpop", "egp"]) {
     const o = document.getElementById(id);
     if (o.classList.contains("open")) { o.classList.remove("open"); return; }
   }
