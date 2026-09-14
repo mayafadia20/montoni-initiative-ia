@@ -790,6 +790,25 @@
     font-size:14px;line-height:1;cursor:pointer;
   }
   .am-close-detail:hover{background:#81907a;color:#fff;border-color:#81907a;}
+  /* Kanban : diagramme EPC du processus touché, à gauche du détail */
+  .am-epc{flex:1;min-width:0;display:none;flex-direction:column;min-height:0;background:#fff;}
+  .am-epc.open{display:flex;}
+  .am-board.hidden{display:none;}
+  .am-epc-head{display:flex;align-items:center;gap:16px;padding:14px 24px;border-bottom:1px solid rgba(13,13,13,.08);flex-wrap:wrap;}
+  .am-epc-head .btn.ghost{padding:7px 12px;font-size:12px;white-space:nowrap;}
+  .am-epc-head .pt{font-size:16px;font-weight:700;line-height:1.2;}
+  .am-epc-head .pd{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(13,13,13,.5);margin-top:3px;}
+  .am-epc-tabs{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap;}
+  .am-epc-tabs button{font:inherit;font-size:12px;padding:6px 11px;border-radius:14px;border:1px solid rgba(13,13,13,.2);background:#fff;color:#0d0d0d;cursor:pointer;}
+  .am-epc-tabs button:hover{border-color:#81907a;}
+  .am-epc-tabs button.active{background:#0d0d0d;color:#fff;border-color:#0d0d0d;}
+  .am-epc-note{font-size:12px;color:rgba(13,13,13,.65);padding:10px 24px;display:flex;align-items:center;gap:8px;background:#fbf3f2;border-bottom:1px solid rgba(192,57,43,.15);}
+  .am-epc-note i{width:14px;height:14px;border-radius:3px;background:#c0392b;display:inline-block;flex:0 0 14px;}
+  .am-epc-scroll{flex:1;overflow:auto;padding:22px 24px 60px;}
+  .am-epc-scroll .epc-chain{min-width:0;width:100%;}
+  .epc-func.goulot{background:#c0392b;box-shadow:0 0 0 4px rgba(192,57,43,.22);}
+  .epc-func.goulot .num{opacity:.85;}
+  .am-epc-empty{padding:40px 24px;font-size:13px;color:rgba(13,13,13,.55);line-height:1.5;}
   #rapport{
     position:fixed;top:0;left:400px;right:0;bottom:0;display:none;flex-direction:column;
     background:#fff;color:#0d0d0d;z-index:4;
@@ -1009,6 +1028,7 @@
     <span class="am-count" id="am-count"></span>
   </div>
   <div class="am-body">
+    <div class="am-epc" id="am-epc"></div>
     <div class="am-board" id="am-board"></div>
     <div class="am-detail" id="am-detail"></div>
   </div>
@@ -4416,9 +4436,262 @@ function amCarte(it, catId) {
   return card;
 }
 
+
+/* ---------------------------------------------------------------------
+   Kanban : étape(s) de processus touchée(s) par chaque goulot, par nom de
+   processus. Sert à colorer l'étape en rouge dans le diagramme EPC affiché
+   à gauche quand un goulot est sélectionné.
+   --------------------------------------------------------------------- */
+const AM_ETAPES = {
+  /* PSDT */
+  "6.1":  { "Acquisition d'un terrain": ["Rédiger le sommaire exécutif"] },
+  "6.2":  { "Acquisition d'un terrain": ["Monter le deal sheet", "Négocier la lettre d'intention et l'offre d'achat"] },
+  "6.3":  { "Acquisition d'un terrain": ["Monter le deal sheet"] },
+  "6.4":  { "Acquisition d'un terrain": ["Pré-qualifier le terrain"] },
+  "6.5":  { "Acquisition d'un terrain": ["Négocier la lettre d'intention et l'offre d'achat"] },
+  "6.6":  { "Acquisition d'un terrain": ["Pré-qualifier le terrain"], "Entente de développement avec une ville": ["Mener la due diligence du secteur"] },
+  "6.7":  { "Acquisition d'un terrain": ["Piloter la due diligence"] },
+  "6.8":  { "Acquisition d'un terrain": ["Pré-qualifier le terrain"], "Entente de développement avec une ville": ["Mener la due diligence du secteur"] },
+  "6.9":  { "Acquisition d'un terrain": ["Obtenir concept, estimé et pro forma"] },
+  "6.10": { "Acquisition d'un terrain": ["Négocier la lettre d'intention et l'offre d'achat", "Lever les conditions et clore"] },
+  "6.11": { "Entente de développement avec une ville": ["Mener la due diligence du secteur", "Signer l'entente officielle"] },
+  "6.12": { "Acquisition d'un terrain": ["Transférer au Développement de projets"] },
+  "6.13": { "Acquisition d'un terrain": ["Rédiger le sommaire exécutif"] },
+  /* Urbanisme */
+  "5.1":  { "Analyse réglementaire d'un projet": ["Monter la checklist réglementaire"] },
+  "5.2":  { "Analyse réglementaire d'un projet": ["Monter la checklist réglementaire", "Déposer et suivre les permis"] },
+  "5.3":  { "Faisabilité réglementaire avant acquisition": ["Revoir les terrains en rencontre hebdomadaire"] },
+  "5.4":  { "Analyse réglementaire d'un projet": ["Analyser la conformité des plans"] },
+  "5.5":  { "Analyse réglementaire d'un projet": ["Monter le rapport argumentaire"] },
+  "5.6":  { "Faisabilité réglementaire avant acquisition": ["Vérifier le zonage auprès de la ville"] },
+  "5.7":  { "Analyse réglementaire d'un projet": ["Récupérer la réglementation"], "Faisabilité réglementaire avant acquisition": ["Vérifier le zonage auprès de la ville"] },
+  "5.8":  { "Analyse réglementaire d'un projet": ["Prioriser le mandat", "Analyser la conformité des plans"] },
+  "5.9":  { "Analyse réglementaire d'un projet": ["Récupérer la réglementation"] },
+  /* Location */
+  "9.1":  { "Prospection sortante": ["Appeler les prospects"] },
+  "9.2":  { "Prospection sortante": ["Appeler les prospects"] },
+  "9.3":  { "Prospection sortante": ["Envoyer le publipostage"] },
+  "9.4":  { "Prospection sortante": ["Importer des listes de prospects"] },
+  "9.5":  { "Réponse à une demande de courtier": ["Qualifier la demande"], "Prospection sortante": ["Appeler les prospects"] },
+  "9.6":  { "Réponse à une demande de courtier": ["Cibler les propriétés"] },
+  "9.7":  { "Réponse à une demande de courtier": ["Créer le lead et faire le credit check", "Convertir en opportunité"] },
+  "9.8":  { "Réponse à une demande de courtier": ["Obtenir plans et estimation des travaux"] },
+  "9.9":  { "Réponse à une demande de courtier": ["Envoyer la proposition et négocier"] },
+  "9.10": { "Réponse à une demande de courtier": ["Cibler les propriétés"] },
+  "9.11": { "Réponse à une demande de courtier": ["Monter le pro forma de location"] },
+  /* Développement de projets */
+  "1.1":  { "Préconstruction d'un projet": ["Produire l'estimé", "Produire l'échéancier"] },
+  "1.2":  { "Préconstruction d'un projet": ["Rédiger le devis"], "Réponse à un appel d'offres client": ["Monter la réponse"] },
+  "1.3":  { "Préconstruction d'un projet": ["Rédiger le devis"] },
+  "1.4":  { "Préconstruction d'un projet": ["Produire l'estimé"] },
+  "1.5":  { "Préconstruction d'un projet": ["Itérer avec le client"] },
+  "1.6":  { "Préconstruction d'un projet": ["Produire l'échéancier"] },
+  "1.7":  { "Réponse à un appel d'offres client": ["Lire le devis du client"] },
+  "1.8":  { "Réponse à un appel d'offres client": ["Répartir les livrables"] },
+  "1.9":  { "Préconstruction d'un projet": ["Rédiger le devis"] },
+  "1.10": { "Préconstruction d'un projet": ["Tenir le budget review"] },
+  "1.11": { "Préconstruction d'un projet": ["Signer le contrat"] },
+  "1.12": { "Préconstruction d'un projet": ["Décider le go ou no-go"] },
+  "1.13": { "Préconstruction d'un projet": ["Produire l'estimé"] },
+  "1.14": { "Préconstruction d'un projet": ["Kick-off avec Design et Estimation"] },
+  "1.15": { "Préconstruction d'un projet": ["Ouvrir le dossier", "Tenir le budget review"] },
+  /* Design et Architecture */
+  "7.1":  { "Production d'un plan préliminaire": ["Vérifier le zonage et le code"] },
+  "7.2":  { "Production d'un plan préliminaire": ["Recevoir le mandat"] },
+  "7.3":  { "Production d'un plan préliminaire": ["Vérifier le zonage et le code", "Dessiner le concept"] },
+  "7.4":  { "Production d'un plan préliminaire": ["Recevoir le mandat"] },
+  "7.5":  { "Production d'un plan préliminaire": ["Dessiner le concept"] },
+  "7.6":  { "Production d'un plan préliminaire": ["Recevoir le mandat"] },
+  "7.7":  { "Production d'un plan préliminaire": ["Vérifier le zonage et le code"] },
+  "7.8":  { "Production d'un plan préliminaire": ["Transmettre à l'Estimation"] },
+  "7.9":  { "Production d'un plan préliminaire": ["Vérifier le zonage et le code"] },
+  "7.10": { "Production d'un plan préliminaire": ["Produire les visuels"] },
+  /* Estimation */
+  "3.1":  { "Soumission": ["Faire le take-off"], "Extraction des quantités depuis Revit": ["Exporter les quantités"] },
+  "3.2":  { "Soumission": ["Ressaisir dans le fichier maître"] },
+  "3.3":  { "Soumission": ["Monter le budget"] },
+  "3.4":  { "Soumission": ["Niveler les soumissions"], "Procurement après le go": ["Octroyer les autres lots"] },
+  "3.5":  { "Soumission": ["Ressaisir dans le fichier maître"] },
+  "3.6":  { "Soumission": ["Monter le budget"] },
+  "3.7":  { "Procurement après le go": ["Transférer à la Construction"] },
+  "3.8":  { "Soumission": ["Valider et signer"] },
+  "3.9":  { "Soumission": ["Tenir le kick-off"] },
+  "3.10": { "Soumission": ["Tenir le kick-off", "Valider et signer"] },
+  "3.11": { "Soumission": ["Faire le take-off"] },
+  "3.12": { "Soumission": ["Solliciter les sous-traitants"] },
+  /* Génie conseil et CQ */
+  "8.1":  { "Production des annexes MEP": ["Refaire le métré interne"], "Extraction des quantités depuis Revit": ["Exporter les quantités"] },
+  "8.2":  { "Production des annexes MEP": ["Calculer charges et scénarios énergétiques"] },
+  "8.3":  { "Production des annexes MEP": ["Analyser les soumissions"] },
+  "8.4":  { "Contrôle qualité après octroi": ["Approuver ou retourner"] },
+  "8.5":  { "Contrôle qualité après octroi": ["Recevoir les dessins d'atelier"] },
+  "8.6":  { "Production des annexes MEP": ["Définir les objectifs de réponse"] },
+  "8.7":  { "Contrôle qualité après octroi": ["Recevoir les dessins d'atelier"] },
+  "8.8":  { "Production des annexes MEP": ["Analyser les soumissions"] },
+  "8.9":  { "Contrôle qualité après octroi": ["Approuver ou retourner"] },
+  "8.10": { "Contrôle qualité après octroi": ["Approuver ou retourner"] },
+  "8.11": { "Production des annexes MEP": ["Calculer charges et scénarios énergétiques"] },
+  /* Construction */
+  "4.1":  { "Exécution d'un projet": ["Ouvrir le projet"] },
+  "4.2":  { "Exécution d'un projet": ["Ouvrir le projet"] },
+  "4.3":  { "Exécution d'un projet": ["Planifier le chantier"] },
+  "4.4":  { "Exécution d'un projet": ["Planifier le chantier"] },
+  "4.5":  { "Exécution d'un projet": ["Suivre les coûts"] },
+  "4.6":  { "Exécution d'un projet": ["Rapporter l'avancement"] },
+  "4.7":  { "Exécution d'un projet": ["Lancer les appels d'offres d'exécution"], "Procurement après le go": ["Octroyer les autres lots"], "Achats groupés": ["Négocier et octroyer"] },
+  "4.8":  { "Exécution d'un projet": ["Rapporter l'avancement"] },
+  /* Approvisionnement */
+  "10.1": { "Commande de chantier": ["Livrer et prouver la livraison"] },
+  "10.2": { "Commande de chantier": ["Livrer et prouver la livraison", "Facturer au projet"] },
+  "10.3": { "Commande de chantier": ["Facturer au projet"] },
+  "10.4": { "Commande de chantier": ["Livrer et prouver la livraison"] },
+  "10.5": { "Commande de chantier": ["Préparer la commande"] },
+  "10.6": { "Commande de chantier": ["Préparer la commande"] },
+  "10.7": { "Achats groupés": ["Consolider les besoins"] },
+  "10.8": { "Commande de chantier": ["Enregistrer la demande"] },
+  /* Investissement */
+  "2.1":  { "Pro forma de développement": ["Monter le modèle"] },
+  "2.2":  { "Suivi du réel et reporting aux partenaires": ["Réconcilier les codes"] },
+  "2.3":  { "Suivi du réel et reporting aux partenaires": ["Monter les rapports"] },
+  "2.4":  { "Pro forma de développement": ["Collecter les intrants"], "Suivi du réel et reporting aux partenaires": ["Lancer la collecte trimestrielle"] },
+  "2.5":  { "Acquisition d'un immeuble stabilisé": ["Monter le pro forma préliminaire"] },
+  "2.6":  { "Acquisition d'un immeuble stabilisé": ["Dépouiller la data room"] },
+  "2.7":  { "Acquisition d'un immeuble stabilisé": ["Rédiger l'underwriting package"] },
+  "2.8":  { "Acquisition d'un immeuble stabilisé": ["Enregistrer l'opportunité"] },
+  "2.9":  { "Pro forma de développement": ["Collecter les intrants"] },
+  "2.10": { "Pro forma de développement": ["Ouvrir le dossier"] },
+  "2.11": { "Suivi du réel et reporting aux partenaires": ["Lancer la collecte trimestrielle"] },
+  "2.12": { "Acquisition d'un immeuble stabilisé": ["Présenter aux partenaires et au comité"] },
+  "2.13": { "Acquisition d'un immeuble stabilisé": ["Itérer le modèle"] },
+  "2.14": { "Acquisition d'un immeuble stabilisé": ["Enregistrer l'opportunité"] },
+  /* Finance Construction */
+  "13.1": { "Projection de chiffre d'affaires": ["Monter la projection"] },
+  "13.2": { "Comptes payables": ["Saisir la facture"], "Rapport financier mensuel": ["Clôturer le mois"] },
+  "13.3": { "Rapport financier mensuel": ["Produire les états"] },
+  "13.4": { "Rapport financier mensuel": ["Clôturer le mois"] },
+  "13.5": { "Comptes payables": ["Payer"] },
+  "13.6": { "Comptes payables": ["Payer"] },
+  "13.7": { "Comptes payables": ["Faire approuver"] },
+  "13.8": { "Projection de chiffre d'affaires": ["Collecter budgets et échéanciers"] },
+  /* Finance Paie */
+  "14.1": { "Cycle de paie": ["Traiter les changements"], "Intégration d'un nouvel employé": ["Préparer le poste"] },
+  "14.2": { "Cycle de paie": ["Traiter les changements"], "Intégration d'un nouvel employé": ["Recevoir la demande des RH"] },
+  "14.3": { "Cycle de paie": ["Produire la paie"] },
+  "14.4": { "Cycle de paie": ["Vérifier les relevés de dépenses"] },
+  "14.5": { "Cycle de paie": ["Produire la paie"] },
+  "14.6": { "Cycle de paie": ["Produire la paie"] },
+  "14.7": { "Cycle de paie": ["Collecter les feuilles de temps"] },
+  "14.8": { "Cycle de paie": ["Traiter les changements"] },
+  "14.9": { "Cycle de paie": ["Produire la paie"] },
+  "14.10": { "Cycle de paie": ["Traiter les changements"] },
+  /* Administration */
+  "11.1": { "Demande interne": ["Commander ou intervenir"] },
+  "11.2": { "Demande interne": ["Commander ou intervenir"] },
+  "11.3": { "Demande interne": ["Recevoir la demande"] },
+  "11.4": { "Demande interne": ["Recevoir la demande"] },
+  "11.5": { "Demande interne": ["Suivre le budget"] },
+  "11.6": { "Intégration d'un nouvel employé": ["Préparer le poste"] },
+  "11.7": { "Demande interne": ["Suivre le budget"] },
+  "11.8": { "Demande interne": ["Commander ou intervenir"] },
+  "11.9": { "Demande interne": ["Suivre le budget"] },
+  /* Affaires publiques */
+  "12.1": { "Communiqué de presse": ["Collecter l'information"] },
+  "12.2": { "Communiqué de presse": ["Collecter l'information", "Faire approuver"] },
+  "12.3": { "Communiqué de presse": ["Collecter l'information"], "Lettre aux voisins": ["Apprendre le démarrage"] },
+  "12.4": { "Lettre aux voisins": ["Rédiger et envoyer la lettre"] },
+  "12.5": { "Communiqué de presse": ["Faire approuver"] },
+  "12.6": { "Communiqué de presse": ["Diffuser"] },
+  "12.7": { "Communiqué de presse": ["Diffuser"] },
+  "12.8": { "Lettre aux voisins": ["Traiter les plaintes"] },
+};
+
+/* Processus rattachés à un goulot : ceux qui le listent, plus ceux de la table ci-dessus */
+function amProcessus(id) {
+  const out = [];
+  DEPARTEMENTS.forEach(d => (d.processus || []).forEach(pr => {
+    if ((pr.goulots || []).includes(id) || (AM_ETAPES[id] && AM_ETAPES[id][pr.nom])) out.push({ d, pr });
+  }));
+  return out;
+}
+
+let amProcSel = null;
+function amEPC(it) {
+  const host = document.getElementById("am-epc");
+  const board = document.getElementById("am-board");
+  if (!it) { host.classList.remove("open"); host.innerHTML = ""; board.classList.remove("hidden"); amProcSel = null; return; }
+  const procs = amProcessus(it.g.id);
+  const memes = procs.filter(x => x.d.nom === it.d.nom);
+  let cur = procs.find(x => x.pr.nom === amProcSel) || memes[0] || procs[0] || null;
+  amProcSel = cur ? cur.pr.nom : null;
+
+  host.innerHTML = "";
+  const head = document.createElement("div"); head.className = "am-epc-head";
+  const back = document.createElement("button"); back.className = "btn ghost"; back.textContent = "← Retour au Kanban";
+  back.addEventListener("click", () => { amSel = null; document.querySelectorAll("#am-board .am-card.sel").forEach(x => x.classList.remove("sel")); amDetail(); });
+  head.appendChild(back);
+  if (cur) {
+    const t = document.createElement("div");
+    t.innerHTML = `<div class="pt">${cur.pr.nom}</div><div class="pd">${cur.d.nom} · processus touché par le goulot ${it.g.id}</div>`;
+    head.appendChild(t);
+    if (procs.length > 1) {
+      const tabs = document.createElement("div"); tabs.className = "am-epc-tabs";
+      procs.forEach(x => {
+        const b = document.createElement("button"); b.className = x === cur ? "active" : "";
+        b.textContent = x.pr.nom + (x.d.nom !== it.d.nom ? " (" + x.d.nom + ")" : "");
+        b.addEventListener("click", () => { amProcSel = x.pr.nom; amEPC(it); });
+        tabs.appendChild(b);
+      });
+      head.appendChild(tabs);
+    }
+  }
+  host.appendChild(head);
+
+  if (!cur) {
+    host.innerHTML += `<div class="am-epc-empty">Aucun processus cartographié n'est rattaché à ce goulot pour l'instant.</div>`;
+    host.classList.add("open"); board.classList.add("hidden"); return;
+  }
+
+  const rouges = (AM_ETAPES[it.g.id] && AM_ETAPES[it.g.id][cur.pr.nom]) || [];
+  const note = document.createElement("div"); note.className = "am-epc-note";
+  note.innerHTML = rouges.length
+    ? `<i></i>En rouge : ${rouges.length > 1 ? "les étapes touchées" : "l'étape touchée"} par ce goulot (${rouges.join(" · ")})`
+    : `<i></i>L'étape précise touchée par ce goulot n'est pas encore identifiée dans ce processus.`;
+  host.appendChild(note);
+
+  const scroll = document.createElement("div"); scroll.className = "am-epc-scroll";
+  const chain = document.createElement("div"); chain.className = "epc-chain";
+  chain.appendChild(epcEvent(cur.pr.declencheur, true));
+  cur.pr.etapes.forEach((et, i) => {
+    chain.appendChild(vlink());
+    const row = document.createElement("div"); row.className = "epc-row";
+    const qb = document.createElement("div"); qb.className = "epc-box epc-org";
+    qb.innerHTML = `<span class="k">Qui</span>`; qb.appendChild(quiChips(et.qui, "small")); row.appendChild(qb);
+    row.appendChild(hlink(false));
+    row.appendChild(docBox("Entrant", et.entrants));
+    row.appendChild(hlink(true));
+    const f = document.createElement("div");
+    f.className = "epc-func" + (rouges.includes(et.etape) ? " goulot" : "");
+    f.innerHTML = `<span class="num">Étape ${i + 1}</span>${et.etape}`;
+    if (rouges.includes(et.etape)) f.title = "Étape touchée par le goulot " + it.g.id + " : " + it.g.titre;
+    row.appendChild(f);
+    row.appendChild(hlink(true));
+    row.appendChild(docBox("Sortant", et.sortants));
+    row.appendChild(hlink(false));
+    const sb = docBox("Système", et.systemes); sb.className = "epc-box epc-sys"; row.appendChild(sb);
+    chain.appendChild(row);
+    chain.appendChild(vlink());
+    chain.appendChild(epcEvent(et.sortants.join(", "), false));
+  });
+  scroll.appendChild(chain); host.appendChild(scroll);
+  host.classList.add("open"); board.classList.add("hidden");
+  const first = chain.querySelector(".epc-func.goulot");
+  if (first) requestAnimationFrame(() => first.scrollIntoView({ block: "center" }));
+}
+
 function amDetail() {
   const det = document.getElementById("am-detail");
   const it = amSel && amIndex.find(x => x.g.id === amSel);
+  amEPC(it || null);
   if (!it) { det.classList.remove("open"); det.innerHTML = ""; return; }
   const { d, dg, g } = it;
   const e = entryFor(d, g);
