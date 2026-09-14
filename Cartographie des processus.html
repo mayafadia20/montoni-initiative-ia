@@ -817,6 +817,29 @@
   .am-btns{margin-bottom:4px;}
   .am-btns .am-ishi{background:#0d0d0d;}
   .am-btns .am-ishi:hover{background:#333;}
+  /* ---------- Systèmes : bulles et échanges de données ---------- */
+  #systemes{
+    position:fixed;top:0;left:400px;right:0;bottom:0;display:none;flex-direction:column;
+    background:#fff;color:#0d0d0d;z-index:4;
+  }
+  #systemes.open{display:flex;}
+  #sys-close{
+    width:36px;height:36px;border-radius:50%;border:1px solid rgba(13,13,13,.25);background:#fff;color:#0d0d0d;
+    font-size:18px;line-height:1;cursor:pointer;
+  }
+  #sys-close:hover{background:#81907a;color:#fff;border-color:#81907a;}
+  #systemes .cap-side .kicker,#systemes .cap-detail .kicker{color:#81907a;}
+  .sys-liens line{stroke:#566a4d;stroke-width:1.1;stroke-opacity:.55;}
+  .sys-liens line.hit{stroke:transparent;stroke-width:14;stroke-opacity:1;pointer-events:stroke;}
+  .sys-lien{transition:opacity .2s;}
+  .sys-lien:hover line:not(.hit){stroke:#0d0d0d;stroke-opacity:.9;}
+  .sys-lien.dim{opacity:.08;}
+  .sys-bulle circle{stroke:#fff;stroke-width:1.5;}
+  .sys-lg{display:flex;align-items:center;gap:10px;font-size:11.5px;color:rgba(13,13,13,.65);margin-bottom:6px;}
+  .sys-lg line{stroke:#566a4d;stroke-width:1.1;}
+  .sys-ech div{display:grid;grid-template-columns:1fr 90px 26px;align-items:center;gap:8px;font-size:12px;padding:4px 0;}
+  .sys-ech i{display:block;height:8px;border-radius:4px;background:#81907a;}
+  .sys-ech b{text-align:right;font-size:11.5px;}
   #rapport{
     position:fixed;top:0;left:400px;right:0;bottom:0;display:none;flex-direction:column;
     background:#fff;color:#0d0d0d;z-index:4;
@@ -983,6 +1006,7 @@
   <div id="globaux"></div>
   <button class="menu-item" id="menu-capacite">Capacité des ressources</button>
   <button class="menu-item" id="menu-amelio">Projets d'amélioration continue</button>
+  <button class="menu-item" id="menu-systemes">Systèmes</button>
 </aside>
 
 <section id="rapport">
@@ -1013,6 +1037,22 @@
   </div>
 </section>
 <div class="cap-tip" id="cap-tip"></div>
+
+<section id="systemes">
+  <div class="epc-head">
+    <div>
+      <div class="kicker">Systèmes</div>
+      <h2>Cartographie des systèmes</h2>
+      <div class="epc-dept">Plus la bulle est grande, plus le système est utilisé. Chaque ligne entre deux systèmes représente une donnée échangée.</div>
+    </div>
+    <button id="sys-close" title="Revenir à la scène">✕</button>
+  </div>
+  <div class="cap-body">
+    <div class="cap-side" id="sys-side"></div>
+    <div class="cap-chart" id="sys-chart"></div>
+    <div class="cap-detail" id="sys-detail"></div>
+  </div>
+</section>
 
 <section id="amelio">
   <div class="epc-head">
@@ -3794,6 +3834,7 @@ function closeDash() {
   closeRapport();
   closeCapacite();
   closeAmelio();
+  closeSystemes();
   globauxEl.classList.remove("open");
   document.getElementById("menu-rapport").classList.remove("active");
 }
@@ -3826,6 +3867,7 @@ function renderGlobaux() {
 function openRapport(g) {
   closeCapacite();
   closeAmelio();
+  closeSystemes();
   document.getElementById("rap-titre").textContent = g.chiffre + " " + g.titre;
   document.getElementById("rap-source").textContent = g.source;
   const map = document.getElementById("rap-map");
@@ -4140,6 +4182,7 @@ function capDetail() {
 function openCapacite() {
   closeRapport();
   closeAmelio();
+  closeSystemes();
   globauxEl.querySelectorAll(".glob").forEach(x => x.classList.remove("active"));
   sceneEl.style.display = "none";
   labelsEl.style.display = "none";
@@ -4737,7 +4780,7 @@ function amRafraichirCartes() {
 }
 
 function openAmelio() {
-  closeRapport(); closeCapacite();
+  closeRapport(); closeCapacite(); closeSystemes();
   globauxEl.querySelectorAll(".glob").forEach(x => x.classList.remove("active"));
   sceneEl.style.display = "none";
   labelsEl.style.display = "none";
@@ -4759,6 +4802,250 @@ function closeAmelio() {
 amBtn.addEventListener("click", () => { if (amEl.classList.contains("open")) closeAmelio(); else openAmelio(); });
 document.getElementById("am-close").addEventListener("click", closeAmelio);
 
+/* ---------------------------------------------------------------------
+   Systèmes : cartographie des systèmes cités dans les étapes de processus.
+   Taille de bulle = nombre d'étapes où le système est utilisé.
+   Lignes = échanges de données entre deux systèmes : une ligne par échange,
+   c'est-à-dire chaque fois que deux systèmes servent dans la même étape ou
+   dans deux étapes consécutives d'un même processus.
+   --------------------------------------------------------------------- */
+const sysEl = document.getElementById("systemes");
+const sysBtn = document.getElementById("menu-systemes");
+let sysData = null, sysSel = null;
+
+/* Regroupement des graphies et des fichiers d'un même outil ; canaux qui ne sont pas des systèmes */
+const SYS_ALIAS = {
+  "courriel": "Outlook", "Courriel": "Outlook", "Boîte courriel dédiée": "Outlook",
+  "sites municipaux": "Sites municipaux", "Portails municipaux": "Sites municipaux",
+  "Excel (fichier maître)": "Excel", "Tableau d'octroi (Excel)": "Excel", "Calculateur Excel": "Excel",
+  "Rencontres": "Rencontre",
+};
+const SYS_EXCLUS = new Set(["Rencontre", "Téléphone", "Fournisseurs", "formulaire", "Tablette"]);
+const SYS_MAX_LIGNES = 10;
+
+function sysNom(x) { return SYS_ALIAS[x] || x; }
+
+function sysCalculer() {
+  const noeuds = new Map(), liens = new Map();
+  let etapes = 0, exclus = new Set();
+  const noeud = n => { if (!noeuds.has(n)) noeuds.set(n, { nom: n, n: 0, depts: new Set(), usages: [] }); return noeuds.get(n); };
+  const lien = (a, b, ctx) => {
+    if (a === b) return;
+    const k = [a, b].sort().join("|");
+    if (!liens.has(k)) liens.set(k, { a: k.split("|")[0], b: k.split("|")[1], n: 0, ctx: [] });
+    const l = liens.get(k); l.n++; l.ctx.push(ctx);
+  };
+  DEPARTEMENTS.forEach(d => (d.processus || []).forEach(pr => {
+    const steps = pr.etapes || [];
+    const sysDe = et => [...new Set((et.systemes || []).map(sysNom))].filter(x => { if (SYS_EXCLUS.has(x)) { exclus.add(x); return false; } return true; });
+    steps.forEach((et, i) => {
+      etapes++;
+      const sys = sysDe(et);
+      sys.forEach(x => { const o = noeud(x); o.n++; o.depts.add(d.nom); o.usages.push({ dept: d.nom, proc: pr.nom, etape: et.etape }); });
+      for (let p = 0; p < sys.length; p++) for (let q = p + 1; q < sys.length; q++) lien(sys[p], sys[q], pr.nom + " · " + et.etape);
+      if (i < steps.length - 1) {
+        const nxt = sysDe(steps[i + 1]);
+        sys.forEach(x => nxt.forEach(y => lien(x, y, pr.nom + " · " + et.etape + " → " + steps[i + 1].etape)));
+      }
+    });
+  }));
+  const liste = [...noeuds.values()].sort((a, b) => b.n - a.n || a.nom.localeCompare(b.nom));
+  const ll = [...liens.values()].sort((a, b) => b.n - a.n);
+  liste.forEach(o => { o.liens = ll.filter(l => l.a === o.nom || l.b === o.nom); o.echanges = o.liens.reduce((s, l) => s + l.n, 0); });
+  return { liste, liens: ll, etapes, exclus: [...exclus] };
+}
+
+/* Disposition : empilement initial puis relaxation (les systèmes liés se rapprochent, aucun chevauchement) */
+function sysLayout(liste, liens, rMax) {
+  const cercles = capPacker(liste, rMax);
+  const idx = new Map(cercles.map((c, i) => [c.p.nom, i]));
+  const maxL = Math.max(1, ...liens.map(l => l.n));
+  for (let it = 0; it < 220; it++) {
+    const t = 1 - it / 220;
+    liens.forEach(l => {
+      const A = cercles[idx.get(l.a)], B = cercles[idx.get(l.b)];
+      const dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || 1;
+      const cible = A.r + B.r + 18 + 90 * (1 - l.n / maxL);
+      const f = (d - cible) / d * 0.012 * (0.4 + l.n / maxL) * t;
+      A.x += dx * f; A.y += dy * f; B.x -= dx * f; B.y -= dy * f;
+    });
+    cercles.forEach(c => { c.x *= 1 - 0.004 * t; c.y *= 1 - 0.004 * t; });
+    for (let k = 0; k < 3; k++) for (let i = 0; i < cercles.length; i++) for (let j = i + 1; j < cercles.length; j++) {
+      const A = cercles[i], B = cercles[j], dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || 0.01, min = A.r + B.r + 8;
+      if (d < min) { const push = (min - d) / d / 2; A.x -= dx * push; A.y -= dy * push; B.x += dx * push; B.y += dy * push; }
+    }
+  }
+  return cercles;
+}
+
+function sysCouleur(n, maxN) {
+  const t = Math.sqrt(n / maxN);
+  const a = [201, 210, 196], b = [86, 106, 77];
+  return "rgb(" + a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(",") + ")";
+}
+
+function renderSystemes() {
+  if (!sysData) sysData = sysCalculer();
+  const { liste, liens, etapes, exclus } = sysData;
+  const chart = document.getElementById("sys-chart");
+  const side = document.getElementById("sys-side");
+  chart.innerHTML = ""; side.innerHTML = "";
+  if (!liste.length) { chart.innerHTML = '<div class="cap-empty">Aucun système cité dans les étapes.</div>'; return; }
+
+  const R_MAX = 70, maxN = liste[0].n;
+  const cercles = sysLayout(liste, liens, R_MAX);
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  cercles.forEach(c => { minX = Math.min(minX, c.x - c.r); minY = Math.min(minY, c.y - c.r); maxX = Math.max(maxX, c.x + c.r); maxY = Math.max(maxY, c.y + c.r); });
+  const pad = 24, W = maxX - minX + pad * 2, H = maxY - minY + pad * 2;
+  const pos = new Map(cercles.map(c => [c.p.nom, { x: c.x - minX + pad, y: c.y - minY + pad, r: c.r }]));
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W.toFixed(0)} ${H.toFixed(0)}`);
+  svg.setAttribute("role", "img"); svg.setAttribute("aria-label", "Cartographie des systèmes et de leurs échanges");
+
+  /* Lignes d'échange, une par donnée échangée, en faisceau parallèle */
+  const gl = document.createElementNS(NS, "g"); gl.setAttribute("class", "sys-liens");
+  liens.forEach(l => {
+    const A = pos.get(l.a), B = pos.get(l.b);
+    const dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || 1, nx = -dy / d, ny = dx / d;
+    const nb = Math.min(l.n, SYS_MAX_LIGNES), ecart = 3.2;
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("class", "sys-lien"); g.dataset.a = l.a; g.dataset.b = l.b;
+    for (let i = 0; i < nb; i++) {
+      const off = (i - (nb - 1) / 2) * ecart;
+      const ln = document.createElementNS(NS, "line");
+      ln.setAttribute("x1", A.x + nx * off); ln.setAttribute("y1", A.y + ny * off);
+      ln.setAttribute("x2", B.x + nx * off); ln.setAttribute("y2", B.y + ny * off);
+      g.appendChild(ln);
+    }
+    const hit = document.createElementNS(NS, "line");
+    hit.setAttribute("class", "hit"); hit.setAttribute("x1", A.x); hit.setAttribute("y1", A.y); hit.setAttribute("x2", B.x); hit.setAttribute("y2", B.y);
+    g.appendChild(hit);
+    g.addEventListener("mousemove", e => {
+      capTip.innerHTML = `<b>${l.a} ↔ ${l.b}</b><div class="c">${l.n} échange${l.n > 1 ? "s" : ""} de données${l.n > SYS_MAX_LIGNES ? " (" + SYS_MAX_LIGNES + " lignes affichées)" : ""}</div><span class="r">${l.ctx.slice(0, 3).join("<br>")}${l.ctx.length > 3 ? "<br>…" : ""}</span>`;
+      capTip.style.display = "block"; capTip.style.left = Math.min(innerWidth - 320, e.clientX + 14) + "px"; capTip.style.top = (e.clientY + 14) + "px";
+    });
+    g.addEventListener("mouseleave", () => { capTip.style.display = "none"; });
+    gl.appendChild(g);
+  });
+  svg.appendChild(gl);
+
+  /* Bulles */
+  cercles.forEach(c => {
+    const p = c.p, P = pos.get(p.nom), fill = sysCouleur(p.n, maxN);
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("class", "cap-bulle sys-bulle"); g.dataset.nom = p.nom;
+    const ci = document.createElementNS(NS, "circle");
+    ci.setAttribute("cx", P.x); ci.setAttribute("cy", P.y); ci.setAttribute("r", P.r); ci.setAttribute("fill", fill);
+    g.appendChild(ci);
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", P.x); t.setAttribute("text-anchor", "middle"); t.setAttribute("fill", capTexte(sysHex(p.n, maxN)));
+    if (P.r >= 22) {
+      t.setAttribute("y", P.y - 1); t.setAttribute("font-size", Math.min(13, Math.max(8.5, P.r / 3)));
+      const l1 = document.createElementNS(NS, "tspan"); l1.setAttribute("x", P.x); l1.textContent = p.nom; t.appendChild(l1);
+      const l2 = document.createElementNS(NS, "tspan"); l2.setAttribute("x", P.x); l2.setAttribute("dy", "1.25em"); l2.setAttribute("font-weight", "400"); l2.setAttribute("font-size", Math.min(11, P.r / 4)); l2.textContent = p.n + " étape" + (p.n > 1 ? "s" : ""); t.appendChild(l2);
+    } else if (P.r >= 14 && p.nom.length <= 8) {
+      t.setAttribute("y", P.y + 3); t.setAttribute("font-size", Math.min(10, Math.max(7.5, P.r * 2.4 / p.nom.length))); t.textContent = p.nom;
+    } else {
+      t.setAttribute("y", P.y + 3); t.setAttribute("font-size", Math.max(7.5, P.r / 2.4)); t.textContent = capInitiales(p.nom);
+    }
+    g.appendChild(t);
+    g.addEventListener("mousemove", e => {
+      capTip.innerHTML = `<b>${p.nom}</b><span class="r">${[...p.depts].join(" · ")}</span><div class="c">${p.n} étape${p.n > 1 ? "s" : ""} · ${p.liens.length} système${p.liens.length > 1 ? "s" : ""} lié${p.liens.length > 1 ? "s" : ""} · ${p.echanges} échange${p.echanges > 1 ? "s" : ""}</div>`;
+      capTip.style.display = "block"; capTip.style.left = Math.min(innerWidth - 300, e.clientX + 14) + "px"; capTip.style.top = (e.clientY + 14) + "px";
+    });
+    g.addEventListener("mouseleave", () => { capTip.style.display = "none"; });
+    g.addEventListener("click", () => { sysSel = sysSel === p.nom ? null : p.nom; sysDetail(); sysFiltrer(); });
+    svg.appendChild(g);
+  });
+  chart.appendChild(svg);
+
+  /* Colonne de gauche */
+  const isoles = liste.filter(p => !p.liens.length);
+  const stat = document.createElement("div"); stat.className = "blk";
+  stat.innerHTML = `<div class="kicker">Vue d'ensemble</div>
+    <div class="cap-stat"><b>${liste.length}</b>systèmes cités dans les étapes de processus</div>
+    <div class="cap-stat" style="margin-top:10px"><b>${liens.length}</b>paires de systèmes qui échangent des données</div>
+    <div class="cap-stat" style="margin-top:10px"><b>${liens.reduce((s, l) => s + l.n, 0)}</b>échanges de données au total</div>
+    <div class="cap-stat" style="margin-top:10px"><b>${isoles.length}</b>système${isoles.length > 1 ? "s" : ""} sans échange avec les autres</div>`;
+  side.appendChild(stat);
+
+  const top = document.createElement("div"); top.className = "blk";
+  top.innerHTML = '<div class="kicker">Systèmes les plus utilisés</div>';
+  liste.slice(0, 8).forEach(p => {
+    const b = document.createElement("button"); b.className = "cap-leg" + (sysSel === p.nom ? " active" : "");
+    b.innerHTML = `<span class="dot" style="background:${sysCouleur(p.n, maxN)}"></span><span>${p.nom}</span><span class="n">${p.n}</span>`;
+    b.addEventListener("click", () => { sysSel = sysSel === p.nom ? null : p.nom; sysDetail(); sysFiltrer(); });
+    top.appendChild(b);
+  });
+  side.appendChild(top);
+
+  const lg = document.createElement("div"); lg.className = "blk";
+  lg.innerHTML = '<div class="kicker">Lecture</div><div class="sys-lg"><svg viewBox="0 0 120 22" width="120" height="22"><line x1="4" y1="11" x2="116" y2="11"/></svg><span>1 échange de données</span></div>' +
+    '<div class="sys-lg"><svg viewBox="0 0 120 22" width="120" height="22"><line x1="4" y1="5" x2="116" y2="5"/><line x1="4" y1="11" x2="116" y2="11"/><line x1="4" y1="17" x2="116" y2="17"/></svg><span>3 échanges de données</span></div>' +
+    `<div class="cap-note">Un système compte une fois par étape où il est cité. Deux systèmes échangent une donnée lorsqu'ils servent dans la même étape ou dans deux étapes qui se suivent. Au-delà de ${SYS_MAX_LIGNES} échanges, le faisceau reste à ${SYS_MAX_LIGNES} lignes et l'infobulle donne le total. Cliquer un système pour isoler ses échanges.` +
+    (exclus.length ? ` Canaux hors système non représentés : ${exclus.join(", ")}.` : "") + "</div>";
+  side.appendChild(lg);
+
+  sysDetail(); sysFiltrer();
+}
+function sysHex(n, maxN) {
+  const m = sysCouleur(n, maxN).match(/\d+/g).map(Number);
+  return "#" + m.map(v => v.toString(16).padStart(2, "0")).join("");
+}
+
+function sysFiltrer() {
+  document.querySelectorAll("#sys-chart .sys-bulle").forEach(g => {
+    const lie = !sysSel || g.dataset.nom === sysSel || sysData.liens.some(l => (l.a === sysSel && l.b === g.dataset.nom) || (l.b === sysSel && l.a === g.dataset.nom));
+    g.classList.toggle("dim", !lie);
+    g.classList.toggle("sel", sysSel === g.dataset.nom);
+  });
+  document.querySelectorAll("#sys-chart .sys-lien").forEach(g => {
+    g.classList.toggle("dim", !!sysSel && g.dataset.a !== sysSel && g.dataset.b !== sysSel);
+  });
+  document.querySelectorAll("#sys-side .cap-leg").forEach(b => b.classList.toggle("active", b.querySelector("span:nth-child(2)").textContent === sysSel));
+}
+
+function sysDetail() {
+  const det = document.getElementById("sys-detail");
+  const p = sysSel && sysData.liste.find(x => x.nom === sysSel);
+  if (!p) { det.classList.remove("open"); det.innerHTML = ""; return; }
+  const autres = p.liens.map(l => ({ nom: l.a === p.nom ? l.b : l.a, n: l.n })).sort((a, b) => b.n - a.n);
+  const procs = new Map();
+  p.usages.forEach(u => { const k = u.dept + " › " + u.proc; if (!procs.has(k)) procs.set(k, { dept: u.dept, proc: u.proc, etapes: [] }); procs.get(k).etapes.push(u.etape); });
+  det.innerHTML = `<div class="kicker">Système</div><h3>${p.nom}</h3><div class="dept">${[...p.depts].join(" · ")}</div>
+    <div class="big">${p.n}<small>étape${p.n > 1 ? "s" : ""}</small></div>
+    <div class="sub">${p.echanges} échange${p.echanges > 1 ? "s" : ""} de données avec ${autres.length} système${autres.length > 1 ? "s" : ""}</div>` +
+    (autres.length ? `<div class="kicker">Échanges</div><div class="sys-ech">${autres.map(a => `<div><span>${a.nom}</span><i style="width:${Math.min(100, a.n * 10)}%"></i><b>${a.n}</b></div>`).join("")}</div>` : `<div class="cap-empty">Aucun échange avec un autre système.</div>`) +
+    `<div class="kicker" style="margin-top:16px">Utilisé dans</div>` +
+    [...procs.values()].map(x => `<div class="cap-proc"><div class="pn">${x.proc}</div><div class="pd">${x.dept}</div><ul>${x.etapes.map(e => `<li>${e}</li>`).join("")}</ul></div>`).join("");
+  det.classList.add("open");
+}
+
+function openSystemes() {
+  closeRapport(); closeCapacite(); closeAmelio();
+  globauxEl.querySelectorAll(".glob").forEach(x => x.classList.remove("active"));
+  sceneEl.style.display = "none";
+  labelsEl.style.display = "none";
+  footerEl.style.display = "none";
+  headerEl.style.display = "none";
+  sysEl.classList.add("open");
+  sysBtn.classList.add("active");
+  renderSystemes();
+}
+function closeSystemes() {
+  if (!sysEl.classList.contains("open")) return;
+  sysEl.classList.remove("open");
+  sysBtn.classList.remove("active");
+  capTip.style.display = "none";
+  sceneEl.style.display = "";
+  labelsEl.style.display = "";
+  footerEl.style.display = "";
+  headerEl.style.display = "";
+}
+sysBtn.addEventListener("click", () => { if (sysEl.classList.contains("open")) closeSystemes(); else openSystemes(); });
+document.getElementById("sys-close").addEventListener("click", closeSystemes);
+
 document.getElementById("close").addEventListener("click", closeSelection);
 addEventListener("keydown", e => {
   if (e.key !== "Escape") return;
@@ -4770,6 +5057,7 @@ addEventListener("keydown", e => {
   else if (rapportEl.classList.contains("open")) closeRapport();
   else if (capEl.classList.contains("open")) closeCapacite();
   else if (amEl.classList.contains("open")) closeAmelio();
+  else if (sysEl.classList.contains("open")) closeSystemes();
   else if (dashEl.classList.contains("open")) closeDash();
   else if (diagEl.classList.contains("open")) closeDiag();
   else if (epcEl.classList.contains("open")) closeEPC();
