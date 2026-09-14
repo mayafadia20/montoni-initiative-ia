@@ -4926,16 +4926,20 @@ function renderSystemes() {
   const heurteEtiq = (rx, ry, w, h) => rects.some(r => rx < r.x + r.w && rx + w > r.x && ry < r.y + r.h && ry + h > r.y);
   cercles.filter(c => !tientDedans(c)).forEach(c => {
     const w = estW(c.p.nom), h = LH, P = c;
-    const cands = [
-      { x: P.x - w / 2, y: P.y + P.r + 3, anchor: "middle", tx: P.x, ty: P.y + P.r + 13 },
-      { x: P.x + P.r + 4, y: P.y - h / 2, anchor: "start", tx: P.x + P.r + 5, ty: P.y + 3.5 },
-      { x: P.x - P.r - 4 - w, y: P.y - h / 2, anchor: "end", tx: P.x - P.r - 5, ty: P.y + 3.5 },
-      { x: P.x - w / 2, y: P.y - P.r - 3 - h, anchor: "middle", tx: P.x, ty: P.y - P.r - 6 },
-      { x: P.x + P.r * 0.72 + 3, y: P.y + P.r * 0.72, anchor: "start", tx: P.x + P.r * 0.72 + 4, ty: P.y + P.r * 0.72 + 9 },
-      { x: P.x - P.r * 0.72 - 3 - w, y: P.y + P.r * 0.72, anchor: "end", tx: P.x - P.r * 0.72 - 4, ty: P.y + P.r * 0.72 + 9 },
-      { x: P.x + P.r * 0.72 + 3, y: P.y - P.r * 0.72 - h, anchor: "start", tx: P.x + P.r * 0.72 + 4, ty: P.y - P.r * 0.72 - 3 },
-      { x: P.x - P.r * 0.72 - 3 - w, y: P.y - P.r * 0.72 - h, anchor: "end", tx: P.x - P.r * 0.72 - 4, ty: P.y - P.r * 0.72 - 3 },
-    ];
+    const cands = [];
+    [3, 18, 34].forEach(g => {
+      const R = P.r + g;
+      cands.push(
+        { x: P.x - w / 2, y: P.y + R, anchor: "middle", tx: P.x, ty: P.y + R + 10 },
+        { x: P.x + R + 1, y: P.y - h / 2, anchor: "start", tx: P.x + R + 2, ty: P.y + 3.5 },
+        { x: P.x - R - 1 - w, y: P.y - h / 2, anchor: "end", tx: P.x - R - 2, ty: P.y + 3.5 },
+        { x: P.x - w / 2, y: P.y - R - h, anchor: "middle", tx: P.x, ty: P.y - R - 3 },
+        { x: P.x + R * 0.72, y: P.y + R * 0.72, anchor: "start", tx: P.x + R * 0.72 + 1, ty: P.y + R * 0.72 + 9 },
+        { x: P.x - R * 0.72 - w, y: P.y + R * 0.72, anchor: "end", tx: P.x - R * 0.72 - 1, ty: P.y + R * 0.72 + 9 },
+        { x: P.x + R * 0.72, y: P.y - R * 0.72 - h, anchor: "start", tx: P.x + R * 0.72 + 1, ty: P.y - R * 0.72 - 3 },
+        { x: P.x - R * 0.72 - w, y: P.y - R * 0.72 - h, anchor: "end", tx: P.x - R * 0.72 - 1, ty: P.y - R * 0.72 - 3 },
+      );
+    });
     let best = null, bestScore = Infinity;
     cands.forEach((k, i) => {
       const score = (heurteBulle(k.x, k.y, w, h, c.p.nom) ? 10 : 0) + (heurteEtiq(k.x, k.y, w, h) ? 5 : 0) + i * 0.1;
