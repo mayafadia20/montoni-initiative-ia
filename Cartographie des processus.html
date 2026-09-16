@@ -5325,13 +5325,13 @@ const ACCES_CLE = "montoni.acces";
     if (i < phrase.length) {
       txt.insertBefore(document.createTextNode(phrase[i]), txt.querySelector(".curseur"));
       i++;
-      setTimeout(ecrire, phrase[i - 1] === " " ? 90 : 42 + Math.random() * 40);
+      setTimeout(ecrire, phrase[i - 1] === " " ? 40 : 16 + Math.random() * 16);
     } else {
-      setTimeout(() => { txt.classList.add("fini"); logo.classList.add("vu"); }, 250);
-      setTimeout(() => btn.classList.add("vu"), 1100);
+      setTimeout(() => { txt.classList.add("fini"); logo.classList.add("vu"); }, 150);
+      setTimeout(() => btn.classList.add("vu"), 700);
     }
   };
-  setTimeout(ecrire, 500);
+  setTimeout(ecrire, 250);
 
   btn.addEventListener("click", () => {
     btn.style.display = "none";
