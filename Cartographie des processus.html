@@ -5509,18 +5509,13 @@ function demoPage(i) {
     pts.appendChild(d);
   });
   clearTimeout(demoTimer);
-  let k = 0;
-  const ecrire = () => {
-    if (k < pg.texte.length) {
-      txt.insertBefore(document.createTextNode(pg.texte[k]), txt.querySelector(".curseur")); k++;
-      demoTimer = setTimeout(ecrire, pg.texte[k - 1] === " " ? 34 : 14 + Math.random() * 14);
-    } else {
-      txt.classList.add("fini");
-      pts.querySelectorAll(".demo-point").forEach((d, j) => setTimeout(() => d.classList.add("vu"), 150 + j * 160));
-      setTimeout(() => suite.classList.add("vu"), 300 + (pg.points || []).length * 160 + 200);
-    }
-  };
-  demoTimer = setTimeout(ecrire, 300);
+  /* Dans le bandeau blanc, le texte apparaît d'un coup ; seuls les points et la flèche s'enchaînent */
+  demoTimer = setTimeout(() => {
+    txt.textContent = pg.texte;
+    txt.classList.add("fini");
+    pts.querySelectorAll(".demo-point").forEach((d, j) => setTimeout(() => d.classList.add("vu"), 250 + j * 140));
+    setTimeout(() => suite.classList.add("vu"), 350 + (pg.points || []).length * 140 + 150);
+  }, 250);
 }
 function openDemo(i) { demoEl.classList.add("open"); demoPage(i || 0); }
 function closeDemo() { clearTimeout(demoTimer); demoHalosClear(); demoEl.classList.remove("open"); }
