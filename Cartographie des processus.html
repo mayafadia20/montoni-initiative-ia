@@ -5546,16 +5546,12 @@ const ACCES_CLE = "montoni.acces";
   const btn = document.getElementById("acc-btn"), form = document.getElementById("acc-form");
   const user = document.getElementById("acc-user"), pass = document.getElementById("acc-pass"), err = document.getElementById("acc-err");
   const phrase = "Bienvenue à l'outil de diagnostic de";
-  let i = 0;
+  /* Aucune écriture progressive : la phrase, le logo puis le bouton apparaissent directement */
   const ecrire = () => {
-    if (i < phrase.length) {
-      txt.insertBefore(document.createTextNode(phrase[i]), txt.querySelector(".curseur"));
-      i++;
-      setTimeout(ecrire, phrase[i - 1] === " " ? 40 : 16 + Math.random() * 16);
-    } else {
-      setTimeout(() => { txt.classList.add("fini"); logo.classList.add("vu"); }, 150);
-      setTimeout(() => btn.classList.add("vu"), 700);
-    }
+    txt.textContent = phrase;
+    txt.classList.add("fini");
+    logo.classList.add("vu");
+    setTimeout(() => btn.classList.add("vu"), 400);
   };
   document.getElementById("acc-suite").addEventListener("click", () => {
     el.classList.add("etape2");
