@@ -5623,6 +5623,26 @@ const DEMO_PAGES = [
       demoHalos([() => demoUnion([document.getElementById("menu-rapport"), globauxEl])]);
     },
   },
+  {
+    kicker: "Objectif 2",
+    texte: "Identifier les objectifs départementaux reliés à ces objectifs globaux.",
+    points: [
+      { icone: "objectifs", titre: "Les objectifs départementaux", sous: "par département" },
+      { icone: "cible", titre: "Le lien avec l'objectif global", sous: "qu'ils servent" },
+      { icone: "indicateurs", titre: "Cible, écart et réel", sous: "pour chaque indicateur" },
+    ],
+    avant: () => {
+      openDash();
+      if (!globauxEl.classList.contains("open")) document.getElementById("menu-rapport").click();
+      if (!rapportEl.classList.contains("open")) { const globs = globauxEl.querySelectorAll(".glob"); const g = globs[2] || globs[0]; if (g) g.click(); }
+      const carte = [...document.querySelectorAll("#rap-map .rap-dept")].find(c => /développement de projets/i.test(c.querySelector("h3")?.textContent || ""));
+      if (carte) setTimeout(() => {
+        const sc = rapportEl.querySelector(".rap-scroll");
+        sc.scrollTop = carte.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 40;
+      }, 150);
+      demoHalos([() => carte ? carte.getBoundingClientRect() : null]);
+    },
+  },
 ];
 
 /* Halos violets : entourent des zones de l'écran et suivent leurs mouvements (panneaux qui glissent, défilement) */
