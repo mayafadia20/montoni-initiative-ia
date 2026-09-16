@@ -5533,6 +5533,19 @@ const DEMO_PAGES = [
       openCapacite();
     },
   },
+  {
+    kicker: "Systèmes",
+    texte: "Ces processus ont également permis d'identifier la liste des systèmes utilisés par l'entreprise. Plus la bulle est grande, plus le système est utilisé.",
+    points: [
+      { icone: "systemes", titre: "Les systèmes", sous: "utilisés par l'entreprise" },
+      { icone: "indicateurs", titre: "La taille des bulles", sous: "proportionnelle à l'utilisation" },
+      { icone: "documents", titre: "Les lignes", sous: "données échangées entre systèmes" },
+    ],
+    avant: () => {
+      openDash();
+      openSystemes();
+    },
+  },
 ];
 
 /* Halos violets : entourent des zones de l'écran et suivent leurs mouvements (panneaux qui glissent, défilement) */
