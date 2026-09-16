@@ -5476,9 +5476,7 @@ const ACCES_CLE = "montoni.acces";
 (function accueil() {
   const el = document.getElementById("accueil");
   if (!el) return;
-  let deja = false;
-  try { deja = sessionStorage.getItem(ACCES_CLE) === "ok"; } catch (e) {}
-  if (deja) { el.classList.add("cache"); return; }
+  /* Mode démo : l'accueil et la connexion sont montrés à chaque ouverture de la page */
 
   const txt = document.getElementById("acc-txt"), logo = document.getElementById("acc-logo");
   const btn = document.getElementById("acc-btn"), form = document.getElementById("acc-form");
@@ -5514,7 +5512,6 @@ const ACCES_CLE = "montoni.acces";
     e.preventDefault();
     const u = user.value.trim(), m = pass.value;
     if (u.toLowerCase() === ACCES.utilisateur && m === ACCES.motDePasse) {
-      try { sessionStorage.setItem(ACCES_CLE, "ok"); } catch (x) {}
       err.textContent = "";
       el.classList.add("ferme");
       setTimeout(() => el.classList.add("cache"), 650);
