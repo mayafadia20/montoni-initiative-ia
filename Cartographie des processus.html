@@ -83,6 +83,16 @@
     font-size:10px;letter-spacing:.28em;text-transform:uppercase;
     color:rgba(255,255,255,.55);margin-bottom:8px;
   }
+  .sec-tgl{
+    display:flex;align-items:center;justify-content:space-between;width:100%;
+    background:none;border:none;padding:4px 0;margin:0;cursor:pointer;font:inherit;text-align:left;
+    font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(255,255,255,.55);
+  }
+  .sec-tgl:hover{color:#fff;}
+  .sec-tgl .tri{font-size:10px;color:rgba(255,255,255,.45);transform:rotate(-90deg);transition:transform .2s;}
+  .sec-tgl.open .tri{transform:none;color:#81907a;}
+  .sec-corps{display:none;margin-top:8px;}
+  .sec-corps.open{display:block;}
   #panel h2{
     font-size:23px;font-weight:700;letter-spacing:.04em;line-height:1.2;
     color:#fff;
@@ -1265,14 +1275,14 @@
   <div class="kicker">Objectifs</div>
   <div id="objectifs"></div>
   <div class="sep"></div>
-  <div class="kicker">Ressources humaines</div>
-  <div id="rh"></div>
+  <button class="kicker sec-tgl" data-cible="rh" aria-expanded="false">Ressources humaines<span class="tri">▼</span></button>
+  <div id="rh" class="sec-corps"></div>
   <div class="sep"></div>
-  <div class="kicker">Processus</div>
-  <div id="processus"></div>
+  <button class="kicker sec-tgl" data-cible="processus" aria-expanded="false">Processus<span class="tri">▼</span></button>
+  <div id="processus" class="sec-corps"></div>
   <div class="sep"></div>
-  <div class="kicker">Diagnostics</div>
-  <div id="diagnostics"></div>
+  <button class="kicker sec-tgl" data-cible="diagnostics" aria-expanded="false">Diagnostics<span class="tri">▼</span></button>
+  <div id="diagnostics" class="sec-corps"></div>
 </aside>
 
 <section id="epc">
@@ -3050,7 +3060,17 @@ function closeSelection() {
 function valeurDocumentee(v) { return !!(v && String(v).trim()) && !/^\s*aucun/i.test(String(v)); }
 function indDocumente(ind) { return valeurDocumentee(ind.cible) || valeurDocumentee(ind.reel); }
 
+/* Sections repliables du panneau : ressources humaines, processus, diagnostics */
+function ouvrirSection(id, ouvert) {
+  const corps = document.getElementById(id), tgl = document.querySelector(`.sec-tgl[data-cible="${id}"]`);
+  if (!corps || !tgl) return;
+  const on = ouvert === undefined ? !corps.classList.contains("open") : !!ouvert;
+  corps.classList.toggle("open", on); tgl.classList.toggle("open", on); tgl.setAttribute("aria-expanded", on ? "true" : "false");
+}
+document.querySelectorAll(".sec-tgl").forEach(b => b.addEventListener("click", () => ouvrirSection(b.dataset.cible)));
+
 function renderPanel(d) {
+  ["rh", "processus", "diagnostics"].forEach(id => ouvrirSection(id, false));
   document.getElementById("panel-titre").textContent = d.titre || d.nom;
   const noteEl = document.getElementById("panel-note");
   noteEl.innerHTML = d.note ? `<span class="note">${d.note}</span>` : "";
