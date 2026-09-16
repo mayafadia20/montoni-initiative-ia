@@ -5501,7 +5501,7 @@ function demoPage(i) {
   if (typeof pg.avant === "function") pg.avant();
   const txt = document.getElementById("demo-txt"), pts = document.getElementById("demo-points"), suite = document.getElementById("demo-suite");
   document.getElementById("demo-kicker").textContent = pg.kicker || "";
-  txt.innerHTML = '<span class="curseur"></span>'; txt.classList.remove("fini");
+  txt.textContent = ""; txt.classList.remove("fini");
   pts.innerHTML = ""; suite.classList.remove("vu");
   (pg.points || []).forEach(p => {
     const d = document.createElement("div"); d.className = "demo-point";
@@ -5510,12 +5510,10 @@ function demoPage(i) {
   });
   clearTimeout(demoTimer);
   /* Dans le bandeau blanc, le texte apparaît d'un coup ; seuls les points et la flèche s'enchaînent */
-  demoTimer = setTimeout(() => {
-    txt.textContent = pg.texte;
-    txt.classList.add("fini");
-    pts.querySelectorAll(".demo-point").forEach((d, j) => setTimeout(() => d.classList.add("vu"), 250 + j * 140));
-    setTimeout(() => suite.classList.add("vu"), 350 + (pg.points || []).length * 140 + 150);
-  }, 250);
+  txt.textContent = pg.texte;
+  txt.classList.add("fini");
+  pts.querySelectorAll(".demo-point").forEach(d => d.classList.add("vu"));
+  suite.classList.add("vu");
 }
 function openDemo(i) { demoEl.classList.add("open"); demoPage(i || 0); }
 function closeDemo() { clearTimeout(demoTimer); demoHalosClear(); demoEl.classList.remove("open"); }
