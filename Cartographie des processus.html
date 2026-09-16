@@ -5499,6 +5499,24 @@ const DEMO_PAGES = [
       ]);
     },
   },
+  {
+    kicker: "Processus",
+    texte: "Les différentes étapes de ces processus ont été cartographiées par département, et les ressources humaines ainsi que les systèmes utilisés ont été identifiés.",
+    points: [
+      { icone: "etapes", titre: "Les étapes", sous: "cartographiées par département" },
+      { icone: "personnes", titre: "Les ressources humaines", sous: "identifiées" },
+      { icone: "systemes", titre: "Les systèmes", sous: "utilisés" },
+    ],
+    avant: () => {
+      demoOuvrirDepartement("Développement de projets");
+      clearDonnee();
+      ouvrirSection("objectifs", false);
+      ouvrirSection("processus", true);
+      const b = [...procEl.querySelectorAll(".proc")].find(x => x.textContent.startsWith("Préconstruction d'un projet")) || procEl.querySelector(".proc");
+      if (b) b.click();
+      afficherColonneEPC(false);
+    },
+  },
 ];
 
 /* Halos violets : entourent des zones de l'écran et suivent leurs mouvements (panneaux qui glissent, défilement) */
