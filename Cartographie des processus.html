@@ -939,6 +939,8 @@
   #demo.decale{left:400px;}
   #demo.decale .demo-int{padding-left:36px;}
   #demo.decale-droite{right:420px;}
+  /* Quand la démo est ouverte, les vues à bulles laissent la place au bandeau */
+  body.demo-ouvert #capacite .cap-body,body.demo-ouvert #systemes .cap-body{margin-bottom:200px;}
   #demo-halos{position:fixed;inset:0;pointer-events:none;z-index:9;}
   .demo-halo{
     position:absolute;border:3px solid #8a6f9e;border-radius:36px;
@@ -5517,6 +5519,20 @@ const DEMO_PAGES = [
       afficherColonneEPC(false);
     },
   },
+  {
+    kicker: "Capacité des ressources",
+    texte: "Les processus ont permis d'identifier la charge de travail des ressources humaines, basée sur le nombre d'étapes où chaque personne est impliquée.",
+    points: [
+      { icone: "personnes", titre: "La charge de travail", sous: "par personne" },
+      { icone: "etapes", titre: "Le nombre d'étapes", sous: "où la personne intervient" },
+      { icone: "indicateurs", titre: "La taille des bulles", sous: "proportionnelle à cette charge" },
+    ],
+    avant: () => {
+      closeEPC();
+      openDash();
+      openCapacite();
+    },
+  },
 ];
 
 /* Halos violets : entourent des zones de l'écran et suivent leurs mouvements (panneaux qui glissent, défilement) */
@@ -5581,8 +5597,8 @@ function demoPage(i) {
   pts.querySelectorAll(".demo-point").forEach(d => d.classList.add("vu"));
   suite.classList.add("vu");
 }
-function openDemo(i) { demoEl.classList.add("open"); demoPage(i || 0); }
-function closeDemo() { clearTimeout(demoTimer); demoHalosClear(); demoEl.classList.remove("open"); }
+function openDemo(i) { demoEl.classList.add("open"); document.body.classList.add("demo-ouvert"); demoPage(i || 0); }
+function closeDemo() { clearTimeout(demoTimer); demoHalosClear(); demoEl.classList.remove("open"); document.body.classList.remove("demo-ouvert"); }
 ["pointerdown", "pointerup", "click"].forEach(t => demoEl.addEventListener(t, e => e.stopPropagation()));
 document.getElementById("demo-suite").addEventListener("click", e => {
   e.stopPropagation();
@@ -5591,10 +5607,12 @@ document.getElementById("demo-suite").addEventListener("click", e => {
   demoPage(demoIndex + 1);
 });
 /* Quand le panneau d'un département est ouvert, le bandeau se décale pour ne pas le recouvrir */
-new MutationObserver(() => demoEl.classList.toggle("decale", panelEl.classList.contains("open")))
+new MutationObserver(() => demoEl.classList.toggle("decale", panelEl.classList.contains("open") || dashEl.classList.contains("open")))
   .observe(panelEl, { attributes: true, attributeFilter: ["class"] });
 new MutationObserver(() => demoEl.classList.toggle("decale-droite", donneeEl.classList.contains("open")))
   .observe(donneeEl, { attributes: true, attributeFilter: ["class"] });
+new MutationObserver(() => demoEl.classList.toggle("decale", panelEl.classList.contains("open") || dashEl.classList.contains("open")))
+  .observe(dashEl, { attributes: true, attributeFilter: ["class"] });
 document.getElementById("demo-fermer").addEventListener("click", closeDemo);
 
 /* ---------------------------------------------------------------------
