@@ -928,6 +928,15 @@
   #demo.open{transform:none;}
   #demo.decale{left:400px;}
   #demo.decale .demo-int{padding-left:36px;}
+  #demo.decale-droite{right:420px;}
+  #demo-halos{position:fixed;inset:0;pointer-events:none;z-index:9;}
+  .demo-halo{
+    position:absolute;border:3px solid #8a6f9e;border-radius:36px;
+    box-shadow:0 0 0 6px rgba(138,111,158,.22),0 0 34px rgba(138,111,158,.55),inset 0 0 22px rgba(138,111,158,.18);
+    opacity:0;transition:opacity .5s ease;animation:demo-pulse 2.2s ease-in-out infinite;
+  }
+  .demo-halo.vu{opacity:1;}
+  @keyframes demo-pulse{0%,100%{box-shadow:0 0 0 6px rgba(138,111,158,.22),0 0 34px rgba(138,111,158,.55),inset 0 0 22px rgba(138,111,158,.18);}50%{box-shadow:0 0 0 10px rgba(138,111,158,.12),0 0 48px rgba(138,111,158,.75),inset 0 0 30px rgba(138,111,158,.28);}}
   .demo-int{max-width:1500px;margin:0 auto;padding:26px 120px 26px 48px;position:relative;min-height:190px;}
   .demo-kicker{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#81907a;margin-bottom:10px;}
   .demo-txt{font-size:clamp(15px,1.35vw,20px);line-height:1.55;color:#0d0d0d;min-height:1.55em;max-width:1100px;}
@@ -1187,6 +1196,7 @@
 </section>
 <div class="cap-tip" id="cap-tip"></div>
 
+<div id="demo-halos" aria-hidden="true"></div>
 <section id="demo" aria-label="Mode démo">
   <div class="demo-int">
     <button class="demo-fermer" id="demo-fermer" title="Quitter le mode démo">✕</button>
@@ -5404,6 +5414,9 @@ const DEMO_ICONES = {
   documents: '<svg viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M2 12h7M7 9.5 9 12l-2 2.5"/><path d="M15 17h7M20 14.5l2 2.5-2 2.5"/></svg>',
   systemes: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/><ellipse cx="12" cy="8" rx="4" ry="1.6"/><path d="M8 8v4c0 .9 1.8 1.6 4 1.6s4-.7 4-1.6V8"/></svg>',
   personnes: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.3c2.9.2 5 2.5 5 5.7"/></svg>',
+  objectifs: '<svg viewBox="0 0 24 24"><path d="M5 21V3"/><path d="M5 4h12l-3 4 3 4H5"/></svg>',
+  indicateurs: '<svg viewBox="0 0 24 24"><path d="M3 21h18"/><rect x="5" y="12" width="3.5" height="7"/><rect x="10.3" y="7" width="3.5" height="12"/><rect x="15.6" y="3.5" width="3.5" height="15.5"/></svg>',
+  cible: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.2"/><circle cx="12" cy="12" r="1.6"/><path d="M12 3v3M21 12h-3"/></svg>',
 };
 const DEMO_PAGES = [
   {
@@ -5417,7 +5430,61 @@ const DEMO_PAGES = [
     ],
     action: () => demoOuvrirDepartement("Développement de projets"),
   },
+  {
+    kicker: "Objectifs et indicateurs",
+    texte: "À partir des entrevues retranscrites, des hypothèses d'objectifs départementaux ont été établies et des indicateurs de performance identifiés, avec des hypothèses de cible chiffrée.",
+    points: [
+      { icone: "objectifs", titre: "Hypothèses d'objectifs", sous: "par département" },
+      { icone: "indicateurs", titre: "Indicateurs de performance", sous: "identifiés en entrevue" },
+      { icone: "cible", titre: "Hypothèses de cible", sous: "chiffrées" },
+    ],
+    avant: () => {
+      demoOuvrirDepartement("Développement de projets");
+      const objs = objsEl.querySelectorAll(".obj");
+      const o4 = objs[3] || objs[objs.length - 1];
+      if (o4 && !o4.classList.contains("active")) o4.click();
+      const ind = [...objsEl.querySelectorAll(".ind")].find(x => x.textContent.trim() === "Heures par itération") || objsEl.querySelector(".inds.open .ind");
+      if (ind) ind.click();
+      demoHalos([
+        () => demoUnion([objsEl.previousElementSibling, objsEl]),
+        () => demoUnion([...donneeEl.querySelectorAll(".half.cible .kicker, .half.cible .ind-name, .half.cible .val-row")]),
+      ]);
+    },
+  },
 ];
+
+/* Halos violets : entourent des zones de l'écran et suivent leurs mouvements (panneaux qui glissent, défilement) */
+const demoHalosEl = document.getElementById("demo-halos");
+let demoHalosCibles = [], demoHalosRaf = null;
+function demoUnion(els) {
+  let r = null;
+  els.filter(Boolean).forEach(e => {
+    const b = e.getBoundingClientRect(); if (!b.width && !b.height) return;
+    r = r ? { left: Math.min(r.left, b.left), top: Math.min(r.top, b.top), right: Math.max(r.right, b.right), bottom: Math.max(r.bottom, b.bottom) }
+          : { left: b.left, top: b.top, right: b.right, bottom: b.bottom };
+  });
+  return r;
+}
+function demoHalos(cibles) {
+  demoHalosClear();
+  demoHalosCibles = cibles;
+  cibles.forEach(() => { const h = document.createElement("div"); h.className = "demo-halo"; demoHalosEl.appendChild(h); });
+  const tick = () => {
+    demoHalosRaf = requestAnimationFrame(tick);
+    demoHalosEl.querySelectorAll(".demo-halo").forEach((h, i) => {
+      const r = demoHalosCibles[i](); if (!r) { h.style.opacity = 0; return; }
+      const m = 14;
+      h.style.left = (r.left - m) + "px"; h.style.top = (r.top - m) + "px";
+      h.style.width = (r.right - r.left + m * 2) + "px"; h.style.height = (r.bottom - r.top + m * 2) + "px";
+    });
+  };
+  tick();
+  setTimeout(() => demoHalosEl.querySelectorAll(".demo-halo").forEach(h => h.classList.add("vu")), 700);
+}
+function demoHalosClear() {
+  cancelAnimationFrame(demoHalosRaf); demoHalosRaf = null; demoHalosCibles = [];
+  demoHalosEl.innerHTML = "";
+}
 /* Ouvre le panneau d'un département depuis la démo (même effet qu'un clic sur sa pyramide) */
 function demoOuvrirDepartement(nom) {
   const i = DEPARTEMENTS.findIndex(d => d.nom === nom);
@@ -5430,6 +5497,8 @@ function demoPage(i) {
   const pg = DEMO_PAGES[i];
   if (!pg) { closeDemo(); return; }
   demoIndex = i;
+  demoHalosClear();
+  if (typeof pg.avant === "function") pg.avant();
   const txt = document.getElementById("demo-txt"), pts = document.getElementById("demo-points"), suite = document.getElementById("demo-suite");
   document.getElementById("demo-kicker").textContent = pg.kicker || "";
   txt.innerHTML = '<span class="curseur"></span>'; txt.classList.remove("fini");
@@ -5454,7 +5523,7 @@ function demoPage(i) {
   demoTimer = setTimeout(ecrire, 300);
 }
 function openDemo(i) { demoEl.classList.add("open"); demoPage(i || 0); }
-function closeDemo() { clearTimeout(demoTimer); demoEl.classList.remove("open"); }
+function closeDemo() { clearTimeout(demoTimer); demoHalosClear(); demoEl.classList.remove("open"); }
 ["pointerdown", "pointerup", "click"].forEach(t => demoEl.addEventListener(t, e => e.stopPropagation()));
 document.getElementById("demo-suite").addEventListener("click", e => {
   e.stopPropagation();
@@ -5465,6 +5534,8 @@ document.getElementById("demo-suite").addEventListener("click", e => {
 /* Quand le panneau d'un département est ouvert, le bandeau se décale pour ne pas le recouvrir */
 new MutationObserver(() => demoEl.classList.toggle("decale", panelEl.classList.contains("open")))
   .observe(panelEl, { attributes: true, attributeFilter: ["class"] });
+new MutationObserver(() => demoEl.classList.toggle("decale-droite", donneeEl.classList.contains("open")))
+  .observe(donneeEl, { attributes: true, attributeFilter: ["class"] });
 document.getElementById("demo-fermer").addEventListener("click", closeDemo);
 
 /* ---------------------------------------------------------------------
