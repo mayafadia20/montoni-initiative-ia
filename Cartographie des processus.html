@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cartographie des processus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;overflow:hidden;}
@@ -841,6 +844,54 @@
   .sys-ech div{display:grid;grid-template-columns:1fr 90px 26px;align-items:center;gap:8px;font-size:12px;padding:4px 0;}
   .sys-ech i{display:block;height:8px;border-radius:4px;background:#81907a;}
   .sys-ech b{text-align:right;font-size:11.5px;}
+  /* ---------- Écran d'accueil : bienvenue, logo, accès protégé ---------- */
+  #accueil{
+    position:fixed;inset:0;z-index:200;background:#81907a;color:#efeee1;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    transition:opacity .6s ease;
+  }
+  #accueil.ferme{opacity:0;pointer-events:none;}
+  #accueil.cache{display:none;}
+  .acc-int{max-width:900px;padding:40px 24px;}
+  .acc-txt{
+    font-size:clamp(16px,2vw,24px);letter-spacing:.34em;text-transform:uppercase;font-weight:500;
+    min-height:1.6em;line-height:1.6;color:rgba(239,238,225,.95);
+  }
+  .acc-txt .curseur{display:inline-block;width:.55em;border-bottom:2px solid #efeee1;margin-left:2px;transform:translateY(-.1em);animation:acc-clig 1s steps(1) infinite;}
+  .acc-txt.fini .curseur{display:none;}
+  @keyframes acc-clig{50%{opacity:0;}}
+  .acc-logo{
+    font-family:"Playfair Display",Georgia,"Times New Roman",serif;font-weight:900;
+    font-size:clamp(64px,12vw,170px);line-height:1;letter-spacing:-.02em;color:#efeee1;
+    margin:22px 0 34px;opacity:0;transform:translateY(14px);transition:opacity .9s ease,transform .9s ease;
+  }
+  .acc-logo.vu{opacity:1;transform:none;}
+  .acc-btn{
+    display:inline-block;border:none;border-radius:6px;padding:15px 38px;background:#0d0d0d;color:#fff;
+    font:inherit;font-size:13px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;cursor:pointer;
+    opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s ease,background .2s;
+  }
+  .acc-btn.vu{opacity:1;transform:none;}
+  .acc-btn:hover{background:#2a2a2a;}
+  .acc-form{
+    display:none;margin:0 auto;width:min(380px,100%);text-align:left;
+    background:rgba(13,13,13,.92);border-radius:10px;padding:26px 28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.28);
+  }
+  .acc-form.vu{display:block;animation:acc-app .35s ease;}
+  @keyframes acc-app{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  .acc-form .kicker{color:#81907a;margin-bottom:14px;}
+  .acc-form label{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6);margin:12px 0 6px;}
+  .acc-form input{
+    width:100%;font:inherit;font-size:14px;padding:11px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.25);
+    background:rgba(255,255,255,.06);color:#fff;
+  }
+  .acc-form input:focus{outline:none;border-color:#81907a;}
+  .acc-form .actions{display:flex;gap:10px;align-items:center;margin-top:20px;}
+  .acc-form .btn{padding:11px 22px;letter-spacing:.14em;text-transform:uppercase;font-size:12px;}
+  .acc-form .btn.ghost{background:none;color:rgba(255,255,255,.75);border-color:rgba(255,255,255,.3);}
+  .acc-form .btn.ghost:hover{color:#fff;background:rgba(255,255,255,.08);}
+  .acc-err{font-size:12px;color:#e6a29b;margin-top:12px;min-height:1.4em;line-height:1.4;}
+  .acc-pied{position:absolute;bottom:22px;left:0;right:0;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:rgba(239,238,225,.55);}
   #rapport{
     position:fixed;top:0;left:400px;right:0;bottom:0;display:none;flex-direction:column;
     background:#fff;color:#0d0d0d;z-index:4;
@@ -993,6 +1044,27 @@
 </style>
 </head>
 <body>
+
+<div id="accueil" role="dialog" aria-label="Accès à l'outil de diagnostic">
+  <div class="acc-int">
+    <div class="acc-txt" id="acc-txt"><span class="curseur"></span></div>
+    <div class="acc-logo" id="acc-logo">MONTONI</div>
+    <button class="acc-btn" id="acc-btn">Accéder</button>
+    <form class="acc-form" id="acc-form" autocomplete="off">
+      <div class="kicker">Accès réservé</div>
+      <label for="acc-user">Nom d'utilisateur</label>
+      <input id="acc-user" type="text" autocomplete="username">
+      <label for="acc-pass">Mot de passe</label>
+      <input id="acc-pass" type="password" autocomplete="current-password">
+      <div class="acc-err" id="acc-err"></div>
+      <div class="actions">
+        <button type="submit" class="btn">Entrer</button>
+        <button type="button" class="btn ghost" id="acc-annuler">Annuler</button>
+      </div>
+    </form>
+  </div>
+  <div class="acc-pied">Outil de diagnostic · Initiative IA</div>
+</div>
 
 <header>
   <p>Cartographie des processus</p>
@@ -5231,6 +5303,61 @@ function animate() {
   updateLabels();
 }
 animate();
+/* ---------------------------------------------------------------------
+   Écran d'accueil : texte qui s'écrit, logo, bouton Accéder et connexion.
+   Les identifiants sont vérifiés côté navigateur (maquette de démonstration).
+   --------------------------------------------------------------------- */
+const ACCES = { utilisateur: "montoni", motDePasse: "diagnostic2026" };
+const ACCES_CLE = "montoni.acces";
+(function accueil() {
+  const el = document.getElementById("accueil");
+  if (!el) return;
+  let deja = false;
+  try { deja = sessionStorage.getItem(ACCES_CLE) === "ok"; } catch (e) {}
+  if (deja) { el.classList.add("cache"); return; }
+
+  const txt = document.getElementById("acc-txt"), logo = document.getElementById("acc-logo");
+  const btn = document.getElementById("acc-btn"), form = document.getElementById("acc-form");
+  const user = document.getElementById("acc-user"), pass = document.getElementById("acc-pass"), err = document.getElementById("acc-err");
+  const phrase = "Bienvenue à l'outil de diagnostic de";
+  let i = 0;
+  const ecrire = () => {
+    if (i < phrase.length) {
+      txt.insertBefore(document.createTextNode(phrase[i]), txt.querySelector(".curseur"));
+      i++;
+      setTimeout(ecrire, phrase[i - 1] === " " ? 90 : 42 + Math.random() * 40);
+    } else {
+      setTimeout(() => { txt.classList.add("fini"); logo.classList.add("vu"); }, 250);
+      setTimeout(() => btn.classList.add("vu"), 1100);
+    }
+  };
+  setTimeout(ecrire, 500);
+
+  btn.addEventListener("click", () => {
+    btn.style.display = "none";
+    form.classList.add("vu");
+    setTimeout(() => user.focus(), 50);
+  });
+  document.getElementById("acc-annuler").addEventListener("click", () => {
+    form.classList.remove("vu"); err.textContent = ""; user.value = ""; pass.value = "";
+    btn.style.display = ""; btn.classList.add("vu");
+  });
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const u = user.value.trim(), m = pass.value;
+    if (u.toLowerCase() === ACCES.utilisateur && m === ACCES.motDePasse) {
+      try { sessionStorage.setItem(ACCES_CLE, "ok"); } catch (x) {}
+      err.textContent = "";
+      el.classList.add("ferme");
+      setTimeout(() => el.classList.add("cache"), 650);
+    } else {
+      err.textContent = "Nom d'utilisateur ou mot de passe incorrect.";
+      pass.value = ""; pass.focus();
+      form.animate([{ transform: "translateX(0)" }, { transform: "translateX(-6px)" }, { transform: "translateX(6px)" }, { transform: "translateX(0)" }], { duration: 260 });
+    }
+  });
+})();
+
 </script>
 </body>
 </html>
