@@ -5299,17 +5299,21 @@ function pickAt(clientX, clientY) {
 }
 
 container.addEventListener("pointerdown", e => {
+  if (e.target !== renderer.domElement) return;
   dragging = true;
   px = downX = e.clientX; py = downY = e.clientY;
   retourFace = false; clearTimeout(idleTimer);
   container.classList.add("dragging");
 });
+/* Un clic commencé ailleurs que sur la scène (bandeau, fenêtres, menus) ne doit jamais sélectionner un département */
+addEventListener("pointerdown", e => { if (e.target !== renderer.domElement) { dragging = false; container.classList.remove("dragging"); } }, true);
+addEventListener("pointercancel", () => { dragging = false; container.classList.remove("dragging"); });
 addEventListener("pointerup", e => {
   if (!dragging) return;
   dragging = false;
   container.classList.remove("dragging");
   const moved = Math.hypot(e.clientX - downX, e.clientY - downY);
-  if (moved < 6) {
+  if (moved < 6 && e.target === renderer.domElement) {
     const i = pickAt(e.clientX, e.clientY);
     if (i >= 0) select(i);
   }
@@ -5443,7 +5447,8 @@ function demoPage(i) {
 }
 function openDemo(i) { demoEl.classList.add("open"); demoPage(i || 0); }
 function closeDemo() { clearTimeout(demoTimer); demoEl.classList.remove("open"); }
-document.getElementById("demo-suite").addEventListener("click", () => demoPage(demoIndex + 1));
+["pointerdown", "pointerup", "click"].forEach(t => demoEl.addEventListener(t, e => e.stopPropagation()));
+document.getElementById("demo-suite").addEventListener("click", e => { e.stopPropagation(); demoPage(demoIndex + 1); });
 document.getElementById("demo-fermer").addEventListener("click", closeDemo);
 
 /* ---------------------------------------------------------------------
