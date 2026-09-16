@@ -964,7 +964,11 @@
   .dp-axe svg{width:30px;height:30px;flex:0 0 30px;stroke:#efeee1;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
   .dp-axe b{display:block;font-size:15px;font-weight:700;line-height:1.2;}
   .dp-axe span{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(239,238,225,.7);margin-top:3px;}
-  .dp-suite{animation-delay:1.8s;}
+  .dp-question{font-size:clamp(22px,2.4vw,34px);font-weight:700;color:#efeee1;margin:-10px 0 26px;opacity:0;animation:acc-mont .7s ease 1.7s forwards;}
+  .dp-question:empty{display:none;}
+  .dp-suite{animation-delay:1.9s;}
+  /* Le rapport des objectifs laisse la place au bandeau de démo */
+  body.demo-ouvert #rapport .rap-scroll{padding-bottom:230px;}
   .dp-fermer{
     position:absolute;top:22px;right:24px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(239,238,225,.4);background:transparent;color:#efeee1;
     font-size:15px;line-height:1;cursor:pointer;
@@ -1257,6 +1261,7 @@
     <h1 class="dp-titre" id="dp-titre"></h1>
     <p class="dp-texte" id="dp-texte"></p>
     <div class="dp-axes" id="dp-axes"></div>
+    <div class="dp-question" id="dp-question"></div>
     <button class="acc-suite dp-suite" id="dp-suite" title="Continuer" aria-label="Continuer">
       <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M4 12h14M12 5l7 7-7 7" fill="none" stroke="#0d0d0d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
@@ -5599,6 +5604,24 @@ const DEMO_PAGES = [
       { icone: "couts", titre: "Coûts opérationnels", sous: "à optimiser" },
       { icone: "serveur", titre: "Coûts des systèmes", sous: "à optimiser" },
     ],
+    question: "La stratégie ?",
+  },
+  {
+    kicker: "Objectif 1",
+    texte: "Identifier les objectifs et indicateurs de performance globaux de l'entreprise.",
+    points: [
+      { icone: "objectifs", titre: "Les objectifs globaux", sous: "de l'entreprise" },
+      { icone: "indicateurs", titre: "Les indicateurs de performance", sous: "qui les mesurent" },
+      { icone: "cible", titre: "Cible, réel et écart", sous: "par département" },
+    ],
+    avant: () => {
+      openDash();
+      if (!globauxEl.classList.contains("open")) document.getElementById("menu-rapport").click();
+      const globs = globauxEl.querySelectorAll(".glob");
+      const g = globs[2] || globs[0];
+      if (g) g.click();
+      demoHalos([() => demoUnion([document.getElementById("menu-rapport"), globauxEl])]);
+    },
   },
 ];
 
@@ -5652,6 +5675,7 @@ function demoPage(i) {
     document.getElementById("dp-kicker").textContent = pg.kicker || "";
     document.getElementById("dp-titre").textContent = pg.titre || "";
     document.getElementById("dp-texte").textContent = pg.texte || "";
+    document.getElementById("dp-question").textContent = pg.question || "";
     const axes = document.getElementById("dp-axes"); axes.innerHTML = "";
     (pg.axes || []).forEach(a => {
       const d = document.createElement("div"); d.className = "dp-axe";
