@@ -873,24 +873,33 @@
   }
   .acc-btn.vu{opacity:1;transform:none;}
   .acc-btn:hover{background:#2a2a2a;}
+  .acc-int{transition:transform .55s cubic-bezier(.2,.8,.2,1);}
+  .acc-txt{transition:font-size .5s ease,letter-spacing .5s ease;}
+  .acc-logo{transition:opacity .9s ease,transform .9s ease,font-size .5s ease,margin .5s ease;}
+  #accueil.connexion .acc-int{transform:translateY(calc(-50vh + 120px));}
+  #accueil.connexion .acc-txt{font-size:11px;letter-spacing:.3em;min-height:0;}
+  #accueil.connexion .acc-logo{font-size:clamp(40px,6vw,72px);margin:8px 0 0;}
+  #accueil.connexion .acc-btn{display:none;}
   .acc-form{
-    display:none;margin:0 auto;width:min(380px,100%);text-align:left;
-    background:rgba(13,13,13,.92);border-radius:10px;padding:26px 28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.28);
+    display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-46%);width:min(560px,92vw);text-align:left;
+    background:#fff;color:#0d0d0d;border-radius:14px;padding:42px 46px 38px;box-shadow:0 30px 80px rgba(0,0,0,.30);
   }
-  .acc-form.vu{display:block;animation:acc-app .35s ease;}
-  @keyframes acc-app{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
-  .acc-form .kicker{color:#81907a;margin-bottom:14px;}
-  .acc-form label{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6);margin:12px 0 6px;}
+  .acc-form.vu{display:block;animation:acc-app .4s ease forwards;}
+  @keyframes acc-app{from{opacity:0;transform:translate(-50%,-44%);}to{opacity:1;transform:translate(-50%,-50%);}}
+  .acc-form .kicker{color:#81907a;margin-bottom:6px;}
+  .acc-form h3{font-size:26px;font-weight:700;line-height:1.2;margin:0 0 18px;}
+  .acc-form label{display:block;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(13,13,13,.55);margin:16px 0 7px;}
   .acc-form input{
-    width:100%;font:inherit;font-size:14px;padding:11px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.25);
-    background:rgba(255,255,255,.06);color:#fff;
+    width:100%;font:inherit;font-size:16px;padding:14px 15px;border-radius:8px;border:1px solid rgba(13,13,13,.22);
+    background:#f6f7f4;color:#0d0d0d;
   }
-  .acc-form input:focus{outline:none;border-color:#81907a;}
-  .acc-form .actions{display:flex;gap:10px;align-items:center;margin-top:20px;}
-  .acc-form .btn{padding:11px 22px;letter-spacing:.14em;text-transform:uppercase;font-size:12px;}
-  .acc-form .btn.ghost{background:none;color:rgba(255,255,255,.75);border-color:rgba(255,255,255,.3);}
-  .acc-form .btn.ghost:hover{color:#fff;background:rgba(255,255,255,.08);}
-  .acc-err{font-size:12px;color:#e6a29b;margin-top:12px;min-height:1.4em;line-height:1.4;}
+  .acc-form input:focus{outline:none;border-color:#81907a;background:#fff;box-shadow:0 0 0 3px rgba(129,144,122,.2);}
+  .acc-form .actions{display:flex;gap:12px;align-items:center;margin-top:26px;}
+  .acc-form .btn{padding:14px 28px;letter-spacing:.16em;text-transform:uppercase;font-size:12.5px;background:#0d0d0d;color:#fff;}
+  .acc-form .btn:hover{background:#333;}
+  .acc-form .btn.ghost{background:none;color:#0d0d0d;border:1px solid rgba(13,13,13,.3);}
+  .acc-form .btn.ghost:hover{background:rgba(129,144,122,.12);border-color:#81907a;}
+  .acc-err{font-size:12.5px;color:#b5534c;margin-top:12px;min-height:1.4em;line-height:1.4;}
   .acc-pied{position:absolute;bottom:22px;left:0;right:0;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:rgba(239,238,225,.55);}
   #rapport{
     position:fixed;top:0;left:400px;right:0;bottom:0;display:none;flex-direction:column;
@@ -1050,19 +1059,20 @@
     <div class="acc-txt" id="acc-txt"><span class="curseur"></span></div>
     <div class="acc-logo" id="acc-logo">MONTONI</div>
     <button class="acc-btn" id="acc-btn">Accéder</button>
-    <form class="acc-form" id="acc-form" autocomplete="off">
-      <div class="kicker">Accès réservé</div>
-      <label for="acc-user">Nom d'utilisateur</label>
-      <input id="acc-user" type="text" autocomplete="username">
-      <label for="acc-pass">Mot de passe</label>
-      <input id="acc-pass" type="password" autocomplete="current-password">
-      <div class="acc-err" id="acc-err"></div>
-      <div class="actions">
-        <button type="submit" class="btn">Entrer</button>
-        <button type="button" class="btn ghost" id="acc-annuler">Annuler</button>
-      </div>
-    </form>
   </div>
+  <form class="acc-form" id="acc-form" autocomplete="off">
+    <div class="kicker">Accès réservé</div>
+    <h3>Connexion</h3>
+    <label for="acc-user">Nom d'utilisateur</label>
+    <input id="acc-user" type="text" autocomplete="username">
+    <label for="acc-pass">Mot de passe</label>
+    <input id="acc-pass" type="password" autocomplete="current-password">
+    <div class="acc-err" id="acc-err"></div>
+    <div class="actions">
+      <button type="submit" class="btn">Entrer</button>
+      <button type="button" class="btn ghost" id="acc-annuler">Annuler</button>
+    </div>
+  </form>
   <div class="acc-pied">Outil de diagnostic · Initiative IA</div>
 </div>
 
@@ -5334,13 +5344,13 @@ const ACCES_CLE = "montoni.acces";
   setTimeout(ecrire, 250);
 
   btn.addEventListener("click", () => {
-    btn.style.display = "none";
+    el.classList.add("connexion");
     form.classList.add("vu");
-    setTimeout(() => user.focus(), 50);
+    setTimeout(() => user.focus(), 350);
   });
   document.getElementById("acc-annuler").addEventListener("click", () => {
     form.classList.remove("vu"); err.textContent = ""; user.value = ""; pass.value = "";
-    btn.style.display = ""; btn.classList.add("vu");
+    el.classList.remove("connexion");
   });
   form.addEventListener("submit", e => {
     e.preventDefault();
