@@ -1059,15 +1059,20 @@
 
   /* Indicateurs de performance et goulots dans la fenêtre de droite */
   .epc-sec{margin-bottom:26px;padding-bottom:22px;border-bottom:1px solid rgba(13,13,13,.1);}
-  .epc-cycle .epc-cycle-head{position:relative;padding-right:40px;cursor:pointer;user-select:none;}
-  .epc-tri{
-    position:absolute;right:0;top:50%;width:26px;height:26px;border-radius:50%;border:1px solid rgba(13,13,13,.2);background:#fff;
-    display:flex;align-items:center;justify-content:center;font-size:10px;color:#81907a;transform:translateY(-50%);transition:transform .2s,background .15s;
+  /* Bandeau des diagnostics retiré de la vue EPC */
+  .epc-diags{display:none;}
+  /* Bouton unique pour masquer ou réafficher toute la colonne de droite */
+  .epc-main{position:relative;}
+  .epc-cycle-tgl{
+    position:absolute;right:18px;top:16px;z-index:3;width:34px;height:34px;border-radius:50%;
+    border:1px solid rgba(13,13,13,.22);background:#fff;color:#81907a;font-size:12px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(13,13,13,.12);transition:background .15s,color .15s;
   }
-  .epc-cycle .epc-cycle-head:hover .epc-tri{background:#81907a;color:#fff;border-color:#81907a;}
-  .epc-sec.ferme .epc-tri{transform:translateY(-50%) rotate(-90deg);}
-  .epc-sec.ferme > :not(.epc-cycle-head){display:none;}
-  .epc-sec.ferme .epc-cycle-head{margin-bottom:0;}
+  .epc-cycle-tgl:hover{background:#81907a;color:#fff;border-color:#81907a;}
+  .epc-cycle-tgl .tri{display:block;transition:transform .2s;}
+  .epc-main.sans-cycle .epc-cycle{display:none;}
+  .epc-main.sans-cycle .epc-scroll{flex:1 1 auto;width:auto;}
+  .epc-main.sans-cycle .epc-cycle-tgl .tri{transform:rotate(180deg);}
   .kpi{background:#fff;border:1px solid rgba(13,13,13,.1);border-radius:8px;padding:10px 12px;margin-bottom:8px;}
   .kpi .kk{display:inline-block;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(13,13,13,.5);width:78px;flex:0 0 78px;}
   .kpi-desc{font-size:12.5px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;line-height:1.3;}
@@ -1322,11 +1327,12 @@
         <div class="epc-cycle-head"><div class="kicker">Goulots d'étranglement</div><div class="sub">Cliquer une étiquette pour voir la cause et les analyses</div></div>
         <div class="tags" id="epc-goulots"></div>
       </section>
-      <section class="epc-sec ferme">
+      <section class="epc-sec">
         <div class="epc-cycle-head"><div class="kicker">Temps de cycle et délais</div><div class="sub">Par étape, tels que documentés en entrevue</div></div>
         <div id="epc-cycle"></div>
       </section>
     </aside>
+    <button class="epc-cycle-tgl" id="epc-cycle-tgl" title="Masquer la colonne de droite" aria-expanded="true"><span class="tri">▶</span></button>
   </div>
 </section>
 
@@ -3626,15 +3632,16 @@ function closeEPC() {
   procEl.querySelectorAll(".proc").forEach(x => x.classList.remove("active"));
 }
 document.getElementById("epc-close").addEventListener("click", closeEPC);
-/* Sections repliables du panneau EPC : indicateurs, goulots, temps de cycle */
-document.querySelectorAll(".epc-cycle .epc-sec > .epc-cycle-head").forEach(h => {
-  const t = document.createElement("span"); t.className = "epc-tri"; t.textContent = "▼"; h.appendChild(t);
-  h.addEventListener("click", () => h.parentElement.classList.toggle("ferme"));
-});
-function ouvrirSectionEPC(idCorps, ouvert) {
-  const sec = document.getElementById(idCorps)?.closest(".epc-sec"); if (!sec) return;
-  sec.classList.toggle("ferme", ouvert === undefined ? !sec.classList.contains("ferme") : !ouvert);
+/* Colonne de droite de la vue EPC : masquée ou affichée par un seul bouton */
+const epcMainEl = document.querySelector("#epc .epc-main");
+function afficherColonneEPC(visible) {
+  const on = visible === undefined ? epcMainEl.classList.contains("sans-cycle") : !!visible;
+  epcMainEl.classList.toggle("sans-cycle", !on);
+  const b = document.getElementById("epc-cycle-tgl");
+  b.setAttribute("aria-expanded", on ? "true" : "false");
+  b.title = on ? "Masquer la colonne de droite" : "Afficher la colonne de droite";
 }
+document.getElementById("epc-cycle-tgl").addEventListener("click", () => afficherColonneEPC());
 
 /* ---------- Diagnostics : rencontres, contexte, goulots, pistes et projets ---------- */
 const diagListEl = document.getElementById("diagnostics");
