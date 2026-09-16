@@ -1286,8 +1286,8 @@
   <h2 id="panel-titre"></h2>
   <div id="panel-note"></div>
   <div class="sep"></div>
-  <div class="kicker">Objectifs</div>
-  <div id="objectifs"></div>
+  <button class="kicker sec-tgl open" data-cible="objectifs" aria-expanded="true">Objectifs<span class="tri">▼</span></button>
+  <div id="objectifs" class="sec-corps open"></div>
   <div class="sep"></div>
   <button class="kicker sec-tgl" data-cible="rh" aria-expanded="false">Ressources humaines<span class="tri">▼</span></button>
   <div id="rh" class="sec-corps"></div>
@@ -3087,6 +3087,7 @@ function ouvrirSection(id, ouvert) {
 document.querySelectorAll(".sec-tgl").forEach(b => b.addEventListener("click", () => ouvrirSection(b.dataset.cible)));
 
 function renderPanel(d) {
+  ouvrirSection("objectifs", true);
   ["rh", "processus", "diagnostics"].forEach(id => ouvrirSection(id, false));
   document.getElementById("panel-titre").textContent = d.titre || d.nom;
   const noteEl = document.getElementById("panel-note");
