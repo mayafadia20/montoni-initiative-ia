@@ -5643,6 +5643,26 @@ const DEMO_PAGES = [
       demoHalos([() => carte ? carte.getBoundingClientRect() : null]);
     },
   },
+  {
+    kicker: "Objectif 3",
+    texte: "Confirmer la donnée cible attendue pour chaque objectif.",
+    points: [
+      { icone: "cible", titre: "La cible attendue", sous: "pour chaque indicateur" },
+      { icone: "personnes", titre: "À confirmer", sous: "avec chaque département" },
+      { icone: "indicateurs", titre: "La donnée réelle", sous: "pour mesurer l'écart" },
+    ],
+    avant: () => {
+      closeRapport();
+      demoOuvrirDepartement("Développement de projets");
+      ouvrirSection("objectifs", true);
+      const objs = objsEl.querySelectorAll(".obj");
+      const o4 = objs[3] || objs[objs.length - 1];
+      if (o4 && !o4.classList.contains("active")) o4.click();
+      const ind = [...objsEl.querySelectorAll(".ind")].find(x => x.textContent.trim() === "Heures par itération") || objsEl.querySelector(".inds.open .ind");
+      if (ind) ind.click();
+      demoHalos([() => demoUnion([...donneeEl.querySelectorAll(".half.cible .kicker, .half.cible .ind-name, .half.cible .val-row")])]);
+    },
+  },
 ];
 
 /* Halos violets : entourent des zones de l'écran et suivent leurs mouvements (panneaux qui glissent, défilement) */
