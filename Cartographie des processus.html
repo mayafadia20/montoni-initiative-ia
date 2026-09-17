@@ -1012,6 +1012,58 @@
     font-size:13px;line-height:1;cursor:pointer;
   }
   .demo-fermer:hover{background:#81907a;color:#fff;border-color:#81907a;}
+  /* ---------- Sous-menu et vue Gantt des mandats d'amélioration ---------- */
+  .sous-menu{margin:-2px 0 8px 12px;padding-left:12px;border-left:1px solid rgba(129,144,122,.6);}
+  .sous-item{
+    display:block;width:100%;text-align:left;background:none;border:none;border-radius:4px;
+    padding:9px 10px;margin:2px 0;color:rgba(255,255,255,.85);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;
+  }
+  .sous-item:hover{background:rgba(129,144,122,.2);color:#fff;}
+  .sous-item.active{background:#81907a;color:#fff;}
+  #gantt{
+    position:fixed;top:0;left:400px;right:0;bottom:0;display:none;flex-direction:column;
+    background:#fff;color:#0d0d0d;z-index:4;
+  }
+  #gantt.open{display:flex;}
+  #gantt-close{
+    width:36px;height:36px;border-radius:50%;border:1px solid rgba(13,13,13,.25);background:#fff;color:#0d0d0d;
+    font-size:18px;line-height:1;cursor:pointer;
+  }
+  #gantt-close:hover{background:#81907a;color:#fff;border-color:#81907a;}
+  .gantt-legende{display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:12px 40px;border-bottom:1px solid rgba(13,13,13,.08);background:#f6f7f4;font-size:12px;color:rgba(13,13,13,.7);}
+  .gantt-legende .lg{display:flex;align-items:center;gap:7px;}
+  .gantt-legende .lg i{width:14px;height:14px;border-radius:3px;display:inline-block;}
+  .gantt-legende .lg b{font-weight:600;color:#0d0d0d;}
+  .gantt-scroll{flex:1;overflow:auto;padding:22px 40px 60px;}
+  .gantt{display:grid;grid-template-columns:420px 1fr;border:1px solid rgba(13,13,13,.1);border-radius:10px;overflow:hidden;min-width:1100px;}
+  .gantt-head{display:contents;}
+  .gantt-head > div{background:#0d0d0d;color:#fff;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;padding:12px 16px;}
+  .gantt-mois{display:grid;grid-template-columns:repeat(var(--n),1fr);padding:0 !important;}
+  .gantt-mois span{padding:12px 6px;text-align:center;border-left:1px solid rgba(255,255,255,.12);white-space:nowrap;}
+  .gantt-mois span.annee{color:#c7d1c2;}
+  .gantt-row{display:contents;}
+  .gantt-row > div{border-top:1px solid rgba(13,13,13,.08);background:#fff;}
+  .gantt-row:nth-child(even) > div{background:#fbfcfa;}
+  .gantt-info{padding:14px 16px;display:flex;gap:12px;align-items:flex-start;}
+  .gantt-prio{
+    flex:0 0 34px;width:34px;height:34px;border-radius:50%;background:#0d0d0d;color:#fff;font-weight:700;font-size:14px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .gantt-info .t{font-size:14px;font-weight:700;line-height:1.25;}
+  .gantt-info .gobj{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;margin:4px 0 8px;display:flex;align-items:center;gap:6px;color:rgba(13,13,13,.6);}
+  .gantt-info .gobj i{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .gantt-info .chips{display:flex;flex-wrap:wrap;gap:4px;}
+  .gantt-info .ch{font-size:10.5px;padding:3px 7px;border-radius:10px;background:#f0f2ee;border:1px solid rgba(13,13,13,.1);white-space:nowrap;cursor:default;}
+  .gantt-info .ch b{color:#81907a;margin-right:3px;font-weight:700;}
+  .gantt-bars{position:relative;display:grid;grid-template-columns:repeat(var(--n),1fr);min-height:96px;}
+  .gantt-bars i{border-left:1px solid rgba(13,13,13,.06);}
+  .gantt-bar{
+    position:absolute;top:50%;height:34px;transform:translateY(-50%);border-radius:8px;color:#fff;font-size:12px;font-weight:600;
+    display:flex;align-items:center;padding:0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 12px rgba(13,13,13,.18);
+  }
+  .gantt-bar small{font-weight:400;opacity:.85;margin-left:8px;}
+  .gantt-note{font-size:11.5px;color:rgba(13,13,13,.55);line-height:1.5;margin-top:14px;max-width:900px;}
+  body.demo-ouvert #gantt .gantt-scroll{padding-bottom:230px;}
   #rapport{
     position:fixed;top:0;left:400px;right:0;bottom:0;display:none;flex-direction:column;
     background:#fff;color:#0d0d0d;z-index:4;
@@ -1226,6 +1278,9 @@
   <div id="globaux"></div>
   <button class="menu-item" id="menu-capacite">Capacité des ressources</button>
   <button class="menu-item" id="menu-amelio">Projets d'amélioration continue</button>
+  <div class="sous-menu" id="amelio-sous">
+    <button class="sous-item" id="menu-gantt">Gantt des mandats</button>
+  </div>
   <button class="menu-item" id="menu-systemes">Systèmes</button>
 </aside>
 
@@ -1282,6 +1337,19 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h14M12 5l7 7-7 7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
   </div>
+</section>
+
+<section id="gantt">
+  <div class="epc-head">
+    <div>
+      <div class="kicker">Projets d'amélioration continue</div>
+      <h2>Gantt des mandats d'amélioration</h2>
+      <div class="epc-dept">Chaque mandat regroupe plusieurs goulots d'étranglement. La priorité découle de l'objectif global qu'il sert.</div>
+    </div>
+    <button id="gantt-close" title="Revenir à la scène">✕</button>
+  </div>
+  <div class="gantt-legende" id="gantt-legende"></div>
+  <div class="gantt-scroll"><div id="gantt-corps"></div></div>
 </section>
 
 <section id="systemes">
@@ -4106,6 +4174,7 @@ function closeDash() {
   closeCapacite();
   closeAmelio();
   closeSystemes();
+  closeGantt();
   globauxEl.classList.remove("open");
   document.getElementById("menu-rapport").classList.remove("active");
 }
@@ -4139,6 +4208,7 @@ function openRapport(g) {
   closeCapacite();
   closeAmelio();
   closeSystemes();
+  closeGantt();
   document.getElementById("rap-titre").textContent = g.chiffre + " " + g.titre;
   document.getElementById("rap-source").textContent = g.source;
   const map = document.getElementById("rap-map");
@@ -4454,6 +4524,7 @@ function openCapacite() {
   closeRapport();
   closeAmelio();
   closeSystemes();
+  closeGantt();
   globauxEl.querySelectorAll(".glob").forEach(x => x.classList.remove("active"));
   sceneEl.style.display = "none";
   labelsEl.style.display = "none";
@@ -5067,7 +5138,7 @@ function allerAuGoulot(id) {
 }
 
 function openAmelio() {
-  closeRapport(); closeCapacite(); closeSystemes();
+  closeRapport(); closeCapacite(); closeSystemes(); closeGantt();
   globauxEl.querySelectorAll(".glob").forEach(x => x.classList.remove("active"));
   sceneEl.style.display = "none";
   labelsEl.style.display = "none";
@@ -5351,7 +5422,7 @@ function sysDetail() {
 }
 
 function openSystemes() {
-  closeRapport(); closeCapacite(); closeAmelio();
+  closeRapport(); closeCapacite(); closeAmelio(); closeGantt();
   globauxEl.querySelectorAll(".glob").forEach(x => x.classList.remove("active"));
   sceneEl.style.display = "none";
   labelsEl.style.display = "none";
@@ -5374,6 +5445,68 @@ function closeSystemes() {
 sysBtn.addEventListener("click", () => { if (sysEl.classList.contains("open")) closeSystemes(); else openSystemes(); });
 document.getElementById("sys-close").addEventListener("click", closeSystemes);
 
+/* ---------------------------------------------------------------------
+   Gantt des mandats d'amélioration (maquette de démonstration).
+   Chaque mandat regroupe des goulots et sert un objectif global ; la
+   priorité découle de cet objectif. Dates au format AAAA-MM.
+   --------------------------------------------------------------------- */
+const GANTT_MANDATS = [
+  { prio: 1, nom: "Base historique des projets et nomenclature commune", objectif: "14 à 16 %", goulots: ["1.1", "1.2", "3.6", "2.5", "8.6"], debut: "2026-10", fin: "2027-03" },
+  { prio: 2, nom: "Intégration Revit vers l'estimation et le génie", objectif: "14 à 16 %", goulots: ["3.1", "8.1", "1.4", "8.2"], debut: "2026-11", fin: "2027-04" },
+  { prio: 3, nom: "Clôture financière et facturation accélérées", objectif: "14 à 16 %", goulots: ["13.4", "13.3", "13.5", "13.6"], debut: "2027-01", fin: "2027-05" },
+  { prio: 4, nom: "Checklist réglementaire assistée par l'IA", objectif: "25 M pi²", goulots: ["5.1", "5.2", "5.4", "7.1"], debut: "2027-01", fin: "2027-06" },
+  { prio: 5, nom: "Salesforce pour la prospection et le leasing", objectif: "1 M pi²", goulots: ["9.1", "9.2", "9.5", "9.6"], debut: "2027-02", fin: "2027-06" },
+  { prio: 6, nom: "Pro forma et rapports aux investisseurs automatisés", objectif: "1 G$", goulots: ["2.1", "2.2", "2.3", "2.6"], debut: "2027-03", fin: "2027-08" },
+  { prio: 7, nom: "Chaîne d'approvisionnement sans papier", objectif: "14 à 16 %", goulots: ["10.1", "10.2", "10.3", "10.5"], debut: "2027-04", fin: "2027-09" },
+];
+const GANTT_DEBUT = "2026-10", GANTT_MOIS = 12;
+const GANTT_COULEURS = { "1 G$": "#566a4d", "25 M pi²": "#81907a", "14 à 16 %": "#a8894f", "1 M pi²": "#6f8fa6" };
+const ganttEl = document.getElementById("gantt");
+const ganttBtn = document.getElementById("menu-gantt");
+
+function ganttIndexMois(ym) { const [a, m] = ym.split("-").map(Number); const [a0, m0] = GANTT_DEBUT.split("-").map(Number); return (a - a0) * 12 + (m - m0); }
+function ganttLibelleMois(i) {
+  const [a0, m0] = GANTT_DEBUT.split("-").map(Number);
+  const d = new Date(a0, m0 - 1 + i, 1);
+  return { mois: d.toLocaleDateString("fr-CA", { month: "short" }).replace(".", ""), annee: d.getFullYear(), premier: d.getMonth() === 0 || i === 0 };
+}
+function renderGantt() {
+  const corps = document.getElementById("gantt-corps"), leg = document.getElementById("gantt-legende");
+  leg.innerHTML = '<span class="lg"><b>Objectif global servi :</b></span>' + Object.entries(GANTT_COULEURS).map(([k, c]) => {
+    const g = GLOBAUX.find(x => x.chiffre === k);
+    return `<span class="lg"><i style="background:${c}"></i>${k} <span style="opacity:.7">${g ? g.titre : ""}</span></span>`;
+  }).join("");
+  const mandats = [...GANTT_MANDATS].sort((a, b) => a.prio - b.prio);
+  let h = `<div class="gantt" style="--n:${GANTT_MOIS}"><div class="gantt-head"><div>Mandat · priorité · goulots regroupés</div><div class="gantt-mois">` +
+    Array.from({ length: GANTT_MOIS }, (_, i) => { const l = ganttLibelleMois(i); return `<span>${l.mois}${l.premier ? ` <em class="annee">${l.annee}</em>` : ""}</span>`; }).join("") + "</div></div>";
+  mandats.forEach(m => {
+    const g = GLOBAUX.find(x => x.chiffre === m.objectif);
+    const d0 = Math.max(0, ganttIndexMois(m.debut)), d1 = Math.min(GANTT_MOIS, ganttIndexMois(m.fin) + 1);
+    const chips = m.goulots.map(id => { const f = findGoulot(id); return f ? `<span class="ch" title="${f.d.nom}"><b>${id}</b>${f.g.titre}</span>` : ""; }).join("");
+    h += `<div class="gantt-row"><div class="gantt-info"><div class="gantt-prio">${m.prio}</div><div><div class="t">${m.nom}</div>` +
+      `<div class="gobj"><i style="background:${GANTT_COULEURS[m.objectif] || "#999"}"></i>${m.objectif}${g ? " · " + g.titre : ""}</div><div class="chips">${chips}</div></div></div>` +
+      `<div class="gantt-bars" style="--n:${GANTT_MOIS}">` + Array.from({ length: GANTT_MOIS }, () => "<i></i>").join("") +
+      `<div class="gantt-bar" style="left:${(d0 / GANTT_MOIS * 100).toFixed(2)}%;width:${((d1 - d0) / GANTT_MOIS * 100).toFixed(2)}%;background:${GANTT_COULEURS[m.objectif] || "#999"}">${d1 - d0} mois<small>${m.goulots.length} goulots</small></div></div></div>`;
+  });
+  h += "</div><div class=\"gantt-note\">Maquette : mandats, regroupements de goulots et calendrier sont des exemples pour la démonstration. La priorité 1 correspond au mandat qui sert le plus directement l'objectif global de profitabilité.</div>";
+  corps.innerHTML = h;
+}
+function openGantt() {
+  closeRapport(); closeCapacite(); closeAmelio(); closeSystemes();
+  globauxEl.querySelectorAll(".glob").forEach(x => x.classList.remove("active"));
+  sceneEl.style.display = "none"; labelsEl.style.display = "none"; footerEl.style.display = "none"; headerEl.style.display = "none";
+  ganttEl.classList.add("open"); ganttBtn.classList.add("active"); amBtn.classList.add("active");
+  renderGantt();
+}
+function closeGantt() {
+  if (!ganttEl.classList.contains("open")) return;
+  ganttEl.classList.remove("open"); ganttBtn.classList.remove("active");
+  if (!amEl.classList.contains("open")) amBtn.classList.remove("active");
+  sceneEl.style.display = ""; labelsEl.style.display = ""; footerEl.style.display = ""; headerEl.style.display = "";
+}
+ganttBtn.addEventListener("click", () => { if (ganttEl.classList.contains("open")) closeGantt(); else openGantt(); });
+document.getElementById("gantt-close").addEventListener("click", closeGantt);
+
 document.getElementById("close").addEventListener("click", closeSelection);
 addEventListener("keydown", e => {
   if (e.key !== "Escape") return;
@@ -5386,6 +5519,7 @@ addEventListener("keydown", e => {
   else if (capEl.classList.contains("open")) closeCapacite();
   else if (amEl.classList.contains("open")) closeAmelio();
   else if (sysEl.classList.contains("open")) closeSystemes();
+  else if (ganttEl.classList.contains("open")) closeGantt();
   else if (dashEl.classList.contains("open")) closeDash();
   else if (diagEl.classList.contains("open")) closeDiag();
   else if (epcEl.classList.contains("open")) closeEPC();
@@ -5528,6 +5662,18 @@ const DEMO_ICONES = {
   ishikawa: '<svg viewBox="0 0 24 24"><path d="M2 12h17"/><path d="M19 12l3 0"/><path d="M6 6l4 6M12 6l4 6M6 18l4-6M12 18l4-6"/></svg>',
   pourquoi: '<svg viewBox="0 0 24 24"><path d="M12 3v3M12 9v3M12 15v3"/><rect x="8" y="6" width="8" height="3" rx="1"/><rect x="8" y="12" width="8" height="3" rx="1"/><rect x="8" y="18" width="8" height="3" rx="1"/></svg>',
 };
+const DEMO_CATS_DESC = {
+  ENAV: "retirer les tâches qui n'apportent rien au client ni au processus.",
+  SIMP: "réduire le nombre d'étapes, d'allers-retours et d'approbations.",
+  STD: "adopter des gabarits, des codifications et des nomenclatures communes.",
+  RESP: "préciser qui décide, qui exécute et qui valide à chaque étape.",
+  CAP: "dimensionner les ressources et lisser la charge de travail.",
+  DATA: "rendre l'information fiable, centralisée et accessible à ceux qui en ont besoin.",
+  INTEG: "faire communiquer les systèmes pour éliminer les ressaisies.",
+  AUTO: "confier aux systèmes les tâches répétitives et les relances.",
+  IA: "utiliser l'intelligence artificielle pour lire, synthétiser et proposer.",
+};
+const DEMO_CATS_ICONE = { ENAV: "loupe", SIMP: "etapes", STD: "documents", RESP: "personnes", CAP: "personnes", DATA: "indicateurs", INTEG: "systemes", AUTO: "automatisation", IA: "cible" };
 const DEMO_PAGES = [
   {
     kicker: "Entrevues préliminaires",
@@ -5789,7 +5935,47 @@ const DEMO_PAGES = [
       openWhys();
     },
   },
+  {
+    kicker: "Projets d'amélioration continue",
+    texte: "En fonction des causes identifiées pour chaque goulot d'étranglement, nous pourrons classifier sa piste d'amélioration. Voici les différentes catégories :",
+    points: [
+      { icone: "goulot", titre: "Chaque goulot", sous: "classé selon ses causes" },
+      { icone: "etapes", titre: "Neuf catégories de piste", sous: "une ou deux par goulot" },
+      { icone: "objectifs", titre: "Un projet par piste", sous: "à planifier et suivre" },
+    ],
+    avant: () => { closeOverlays(); demoKanban(); },
+  },
+  ...AM_CATS.map((c, i) => ({
+    kicker: `Catégorie ${i + 1} de ${AM_CATS.length}`,
+    texte: c.nom + " : " + (DEMO_CATS_DESC[c.id] || ""),
+    points: [{ icone: DEMO_CATS_ICONE[c.id] || "etapes", titre: c.nom, sous: "catégorie de piste" }],
+    avant: () => {
+      closeOverlays(); demoKanban();
+      const col = document.querySelector(`#am-board .am-col[data-cat="${c.id}"]`);
+      const board = document.getElementById("am-board");
+      if (col && board) board.scrollLeft = Math.max(0, col.offsetLeft - 40);
+      demoHalos([() => { const h = document.querySelector(`#am-board .am-col[data-cat="${c.id}"] h3`); return h ? h.getBoundingClientRect() : null; }]);
+    },
+  })),
+  {
+    kicker: "Priorisation des mandats",
+    texte: "En fonction des objectifs globaux, nous pouvons établir la priorisation des mandats d'amélioration pour accélérer la performance opérationnelle.",
+    points: [
+      { icone: "objectifs", titre: "Les objectifs globaux", sous: "guident la priorité" },
+      { icone: "goulot", titre: "Un mandat", sous: "regroupe plusieurs goulots" },
+      { icone: "horloge", titre: "Un calendrier", sous: "pour accélérer la performance" },
+    ],
+    avant: () => { closeOverlays(); openDash(); openGantt(); },
+  },
 ];
+/* Ouvre le Kanban depuis la démo, menu visible, filtres remis à zéro */
+function demoKanban() {
+  openDash();
+  if (!amEl.classList.contains("open")) openAmelio();
+  const sd = document.getElementById("am-dept"), ss = document.getElementById("am-statut");
+  if ((sd.value || ss.value) && sd.options.length) { sd.value = ""; ss.value = ""; renderAmelio(); }
+  if (amSel) { amSel = null; amDetail(); }
+}
 
 /* Halos violets : entourent des zones de l'écran et suivent leurs mouvements (panneaux qui glissent, défilement) */
 const demoHalosEl = document.getElementById("demo-halos");
