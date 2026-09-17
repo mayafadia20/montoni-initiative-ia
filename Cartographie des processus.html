@@ -5736,9 +5736,11 @@ function demoHalos(cibles) {
   const tick = () => {
     demoHalosRaf = requestAnimationFrame(tick);
     demoHalosEl.querySelectorAll(".demo-halo").forEach((h, i) => {
-      let r = demoHalosCibles[i](); if (!r) { h.style.opacity = 0; return; }
+      const r0 = demoHalosCibles[i](); if (!r0) { h.style.opacity = 0; return; }
+      const r = { left: r0.left, top: r0.top, right: r0.right, bottom: r0.bottom };
       /* Le halo s'arrête au-dessus du bandeau de démo */
-      if (demoEl.classList.contains("open")) { const lim = demoEl.getBoundingClientRect().top - 10; if (r.bottom > lim) r = { ...r, bottom: Math.max(r.top + 40, lim) }; }
+      if (demoEl.classList.contains("open")) { const lim = demoEl.getBoundingClientRect().top - 10; if (r.bottom > lim) r.bottom = Math.max(r.top + 40, lim); }
+      h.style.opacity = "";
       const m = 14;
       h.style.left = (r.left - m) + "px"; h.style.top = (r.top - m) + "px";
       h.style.width = (r.right - r.left + m * 2) + "px"; h.style.height = (r.bottom - r.top + m * 2) + "px";
