@@ -5515,6 +5515,10 @@ const DEMO_ICONES = {
   efficacite: '<svg viewBox="0 0 24 24"><path d="M3 17l5-5 4 4 8-8"/><path d="M15 8h5v5"/></svg>',
   couts: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6.5v11M15 9.2c0-1.3-1.3-2.2-3-2.2s-3 .9-3 2.2 1.3 1.9 3 2.2 3 1 3 2.4-1.3 2.2-3 2.2-3-.9-3-2.2"/></svg>',
   serveur: '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/><path d="M8 7h.01M8 17h.01"/></svg>',
+  horloge: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>',
+  volume: '<svg viewBox="0 0 24 24"><path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg>',
+  automatisation: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>',
+  dependances: '<svg viewBox="0 0 24 24"><circle cx="5" cy="6" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M7 7.5l3.5 8M17 7.5l-3.5 8M7.5 6h9"/></svg>',
 };
 const DEMO_PAGES = [
   {
@@ -5688,6 +5692,29 @@ const DEMO_PAGES = [
     kicker: "",
     titre: "Comment recueillir les données réelles efficacement ?",
   },
+  {
+    kicker: "Collecte des données réelles",
+    texte: "Les processus étant déjà cartographiés, nous évaluerons avec les exécutants, pour chaque étape :",
+    points: [
+      { icone: "horloge", titre: "Les temps de cycle", sous: "traitement et attentes" },
+      { icone: "volume", titre: "Les volumes gérés", sous: "intrants et extrants" },
+      { icone: "automatisation", titre: "L'automatisation", sous: "% par système" },
+      { icone: "dependances", titre: "Les dépendances", sous: "entre départements" },
+    ],
+    avant: () => {
+      demoOuvrirDepartement("Développement de projets");
+      clearDonnee();
+      ouvrirSection("objectifs", false);
+      ouvrirSection("processus", true);
+      const b = [...procEl.querySelectorAll(".proc")].find(x => x.textContent.startsWith("Préconstruction d'un projet")) || procEl.querySelector(".proc");
+      if (b) b.click();
+      afficherColonneEPC(true);
+      const col = document.querySelector("#epc .epc-cycle");
+      const carte = [...document.querySelectorAll("#epc-cycle .cyc")][6] || document.querySelector("#epc-cycle .cyc");
+      if (carte && col) setTimeout(() => { col.scrollTop = carte.getBoundingClientRect().top - col.getBoundingClientRect().top + col.scrollTop - 24; }, 150);
+      demoHalos([() => carte ? carte.getBoundingClientRect() : null]);
+    },
+  },
 ];
 
 /* Halos violets : entourent des zones de l'écran et suivent leurs mouvements (panneaux qui glissent, défilement) */
@@ -5709,7 +5736,9 @@ function demoHalos(cibles) {
   const tick = () => {
     demoHalosRaf = requestAnimationFrame(tick);
     demoHalosEl.querySelectorAll(".demo-halo").forEach((h, i) => {
-      const r = demoHalosCibles[i](); if (!r) { h.style.opacity = 0; return; }
+      let r = demoHalosCibles[i](); if (!r) { h.style.opacity = 0; return; }
+      /* Le halo s'arrête au-dessus du bandeau de démo */
+      if (demoEl.classList.contains("open")) { const lim = demoEl.getBoundingClientRect().top - 10; if (r.bottom > lim) r = { ...r, bottom: Math.max(r.top + 40, lim) }; }
       const m = 14;
       h.style.left = (r.left - m) + "px"; h.style.top = (r.top - m) + "px";
       h.style.width = (r.right - r.left + m * 2) + "px"; h.style.height = (r.bottom - r.top + m * 2) + "px";
