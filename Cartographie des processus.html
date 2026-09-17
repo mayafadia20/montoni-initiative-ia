@@ -969,6 +969,10 @@
   .dp-suite{animation-delay:1.9s;}
   /* Le rapport des objectifs laisse la place au bandeau de démo */
   body.demo-ouvert #rapport .rap-scroll{padding-bottom:230px;}
+  body.demo-ouvert #demo{z-index:30;}
+  body.demo-ouvert #demo-halos{z-index:31;}
+  body.demo-ouvert .ovl{padding-bottom:210px;}
+  body.demo-ouvert .ovl-card{max-height:calc(100vh - 230px);}
   .dp-fermer{
     position:absolute;top:22px;right:24px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(239,238,225,.4);background:transparent;color:#efeee1;
     font-size:15px;line-height:1;cursor:pointer;
@@ -5519,6 +5523,10 @@ const DEMO_ICONES = {
   volume: '<svg viewBox="0 0 24 24"><path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 16l9 4 9-4"/></svg>',
   automatisation: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>',
   dependances: '<svg viewBox="0 0 24 24"><circle cx="5" cy="6" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M7 7.5l3.5 8M17 7.5l-3.5 8M7.5 6h9"/></svg>',
+  loupe: '<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5h5M10.5 8v5"/></svg>',
+  goulot: '<svg viewBox="0 0 24 24"><path d="M6 3h12M8 3v5l-3 4 3 4v5h8v-5l3-4-3-4V3"/><path d="M9.5 12h5"/></svg>',
+  ishikawa: '<svg viewBox="0 0 24 24"><path d="M2 12h17"/><path d="M19 12l3 0"/><path d="M6 6l4 6M12 6l4 6M6 18l4-6M12 18l4-6"/></svg>',
+  pourquoi: '<svg viewBox="0 0 24 24"><path d="M12 3v3M12 9v3M12 15v3"/><rect x="8" y="6" width="8" height="3" rx="1"/><rect x="8" y="12" width="8" height="3" rx="1"/><rect x="8" y="18" width="8" height="3" rx="1"/></svg>',
 };
 const DEMO_PAGES = [
   {
@@ -5713,6 +5721,72 @@ const DEMO_PAGES = [
       const carte = [...document.querySelectorAll("#epc-cycle .cyc")][6] || document.querySelector("#epc-cycle .cyc");
       if (carte && col) setTimeout(() => { col.scrollTop = carte.getBoundingClientRect().top - col.getBoundingClientRect().top + col.scrollTop - 24; }, 150);
       demoHalos([() => carte ? carte.getBoundingClientRect() : null]);
+    },
+  },
+  {
+    kicker: "Goulots d'étranglement",
+    texte: "Les données recueillies permettront d'identifier les différents goulots d'étranglement de chaque processus.",
+    points: [
+      { icone: "loupe", titre: "Identifiés par les données", sous: "temps, volumes et écarts" },
+      { icone: "goulot", titre: "Un goulot", sous: "par point de blocage observé" },
+      { icone: "etapes", titre: "Rattachés aux étapes", sous: "du processus" },
+    ],
+    avant: () => {
+      closeOverlays();
+      demoOuvrirDepartement("Développement de projets");
+      clearDonnee();
+      ouvrirSection("objectifs", false);
+      ouvrirSection("processus", true);
+      const b = [...procEl.querySelectorAll(".proc")].find(x => x.textContent.startsWith("Préconstruction d'un projet")) || procEl.querySelector(".proc");
+      if (b && !epcEl.classList.contains("open")) b.click();
+      afficherColonneEPC(true);
+      const col = document.querySelector("#epc .epc-cycle");
+      const sec = document.getElementById("epc-goulots").closest(".epc-sec");
+      if (sec && col) setTimeout(() => { col.scrollTop = sec.getBoundingClientRect().top - col.getBoundingClientRect().top + col.scrollTop - 24; }, 150);
+      demoHalos([() => sec ? sec.getBoundingClientRect() : null]);
+    },
+  },
+  {
+    kicker: "Analyse des goulots",
+    texte: "Basé sur les bonnes pratiques du génie industriel, chaque goulot d'étranglement aura une analyse des cinq pourquoi et un diagramme d'Ishikawa, qui relient les causes à l'origine du goulot.",
+    points: [
+      { icone: "pourquoi", titre: "Les cinq pourquoi", sous: "jusqu'à la cause racine" },
+      { icone: "ishikawa", titre: "Le diagramme d'Ishikawa", sous: "les causes par famille" },
+      { icone: "goulot", titre: "Pour chaque goulot", sous: "bonnes pratiques du génie industriel" },
+    ],
+    avant: () => {
+      closeOverlays();
+      const f = findGoulot("1.1");
+      if (f) openGoulot(f);
+      demoHalos([() => demoUnion([document.getElementById("g-cit"), document.querySelector("#gpop .g-btns")])]);
+    },
+  },
+  {
+    kicker: "Diagramme d'Ishikawa",
+    texte: "Le diagramme d'Ishikawa classe les causes du goulot par famille : méthode, main-d'œuvre, machine, matière, milieu et mesure.",
+    points: [
+      { icone: "ishikawa", titre: "Six familles de causes", sous: "les 6M du génie industriel" },
+      { icone: "goulot", titre: "Un effet", sous: "le goulot d'étranglement" },
+      { icone: "loupe", titre: "Des causes documentées", sous: "tirées des entrevues" },
+    ],
+    avant: () => {
+      currentGoulot = findGoulot("1.1");
+      document.getElementById("gpop").classList.remove("open");
+      openIshikawa();
+    },
+  },
+  {
+    kicker: "Analyse des cinq pourquoi",
+    texte: "L'analyse des cinq pourquoi remonte de cause en cause, du problème observé jusqu'à la cause racine du goulot.",
+    points: [
+      { icone: "goulot", titre: "Le problème", sous: "tel qu'observé" },
+      { icone: "pourquoi", titre: "Cinq pourquoi successifs", sous: "chaque réponse est questionnée" },
+      { icone: "cible", titre: "La cause racine", sous: "à traiter en priorité" },
+    ],
+    avant: () => {
+      currentGoulot = findGoulot("1.1");
+      document.getElementById("ishi").classList.remove("open");
+      openWhys();
     },
   },
 ];
