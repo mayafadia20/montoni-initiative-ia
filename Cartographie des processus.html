@@ -5663,6 +5663,31 @@ const DEMO_PAGES = [
       demoHalos([() => demoUnion([...donneeEl.querySelectorAll(".half.cible .kicker, .half.cible .ind-name, .half.cible .val-row")])]);
     },
   },
+  {
+    kicker: "Objectif 4",
+    texte: "Recueillir des données réelles sur les opérations actuelles.",
+    points: [
+      { icone: "indicateurs", titre: "La donnée réelle", sous: "observée aujourd'hui" },
+      { icone: "documents", titre: "Recueillie sur le terrain", sous: "dans les opérations" },
+      { icone: "cible", titre: "Comparée à la cible", sous: "pour mesurer l'écart" },
+    ],
+    avant: () => {
+      closeRapport();
+      demoOuvrirDepartement("Développement de projets");
+      ouvrirSection("objectifs", true);
+      const objs = objsEl.querySelectorAll(".obj");
+      const o4 = objs[3] || objs[objs.length - 1];
+      if (o4 && !o4.classList.contains("active")) o4.click();
+      const ind = [...objsEl.querySelectorAll(".ind")].find(x => x.textContent.trim() === "Heures par itération") || objsEl.querySelector(".inds.open .ind");
+      if (ind && !donneeEl.classList.contains("open")) ind.click();
+      demoHalos([() => demoUnion([...donneeEl.querySelectorAll(".half.reel .kicker, .half.reel .val-row")])]);
+    },
+  },
+  {
+    plein: true,
+    kicker: "",
+    titre: "Comment recueillir les données réelles efficacement ?",
+  },
 ];
 
 /* Halos violets : entourent des zones de l'écran et suivent leurs mouvements (panneaux qui glissent, défilement) */
